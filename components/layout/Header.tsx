@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Roll } from "@/components/ui/Roll";
 import { MorphLabel, MorphIcon } from "@/components/ui/MorphLabel";
 import { SiteMenu } from "./SiteMenu";
+import { Wordmark } from "@/components/brand/Logo";
 
 export function Header() {
   const [hidden, setHidden] = useState(false);
@@ -63,10 +64,10 @@ export function Header() {
       >
         <Link
           href="/"
-          className="pointer-events-auto text-[28px] font-medium tracking-[-0.06em] text-white md:text-[32px]"
+          className="pointer-events-auto block text-white"
           aria-label="Levult, inicio"
         >
-          levult
+          <Wordmark title="" className="h-[22px] w-auto md:h-[26px]" />
         </Link>
       </div>
 

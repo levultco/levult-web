@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { nav } from "@/lib/content";
 import { products } from "@/lib/products";
+import { Wordmark } from "@/components/brand/Logo";
 
 /**
  * The page's close, on the light ground where the fluid comes to rest.
- * Positioned without a z-index so the wordmark can blend with the canvas
- * behind it: its letters turn white wherever a drop passes underneath.
+ * Positioned without a z-index so the logo can blend with the canvas behind
+ * it: its letters turn white wherever a drop passes underneath.
  */
 export function Footer() {
   return (
@@ -39,12 +40,9 @@ export function Footer() {
           Levult crea, lanza y hace crecer productos digitales propios.
         </p>
       </div>
-      <p
-        aria-hidden="true"
-        className="frame mt-24 select-none whitespace-nowrap text-[29vw] font-medium leading-[0.74] tracking-[-0.075em] text-white mix-blend-difference md:text-[30.5vw]"
-      >
-        levult
-      </p>
+      <div className="frame mt-24 text-white mix-blend-difference">
+        <Wordmark title="" className="block h-auto w-full" />
+      </div>
       <div className="frame flex flex-wrap justify-between gap-3 pb-8 pt-8 text-[15px] text-ink-soft">
         <p>© 2026 Levult</p>
         <p>Productos digitales propios</p>

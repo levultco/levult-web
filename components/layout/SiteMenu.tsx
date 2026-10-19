@@ -10,6 +10,7 @@ import { inkCalm, inkPath, inkReach } from "@/lib/ink";
 import { DeviceStage } from "@/components/product/DeviceStage";
 import { Arrow } from "@/components/ui/Arrow";
 import { Roll } from "@/components/ui/Roll";
+import { LogoSymbol } from "@/components/brand/Logo";
 
 type Props = {
   open: boolean;
@@ -154,7 +155,9 @@ export function SiteMenu({ open, anchor, onNavigate }: Props) {
             <Roll>Hablemos</Roll>
             <span aria-hidden="true" className="dot" />
           </a>
-          <p className="text-[15px] text-ink-soft-dark">© 2026 Levult</p>
+          <p className="flex items-center gap-3 text-[15px] text-ink-soft-dark">
+            <LogoSymbol title="" className="h-7 w-auto text-ground" />© 2026
+          </p>
         </div>
       </div>
     </div>

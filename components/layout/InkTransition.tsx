@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { announceReveal } from "@/lib/reveal-gate";
 import { inkCalm, inkPath, inkReach } from "@/lib/ink";
+import { Wordmark } from "@/components/brand/Logo";
 
 /*
  * Ink, the brand's fluid in 2D. Moving between pages, a drop of black ink is
@@ -24,7 +25,7 @@ type Ink = {
 
 // Kept with the component so the first-visit cover can never show without the
 // rule that hides it: the solid cover only exists while html.intro is set.
-const css = `html.intro .ink-cover{display:block!important}`;
+const css = `html.intro .ink-cover{display:block!important}html.intro .ink-logo{display:grid!important}html.intro .ink-logo svg{clip-path:inset(0 100% 0 0)}`;
 
 export function InkTransition() {
   const router = useRouter();
@@ -32,6 +33,7 @@ export function InkTransition() {
   const svg = useRef<SVGSVGElement>(null);
   const path = useRef<SVGPathElement>(null);
   const cover = useRef<HTMLDivElement>(null);
+  const logo = useRef<HTMLDivElement>(null);
   const ink = useRef<Ink>({ mode: "drop", x: 0, y: 0, r: 0, max: 1 });
   const covering = useRef(false);
   const target = useRef({ x: 0, y: 0 });
@@ -79,19 +81,30 @@ export function InkTransition() {
     });
   };
 
-  // First visit: the screen starts full of ink and opens from the middle.
+  // First visit: the screen starts full of ink, the logo writes itself across
+  // it, then steps back as the ink opens from the middle.
   useEffect(() => {
     const html = document.documentElement;
     if (!html.classList.contains("intro")) return;
-    const id = window.setTimeout(() => {
-      openFrom(window.innerWidth / 2, window.innerHeight * 0.55, 1.4, () => {
-        html.classList.remove("intro");
-        try {
-          sessionStorage.setItem("levult-intro-seen", "1");
-        } catch {}
-      });
-    }, 250);
-    return () => window.clearTimeout(id);
+    const done = () => {
+      html.classList.remove("intro");
+      try {
+        sessionStorage.setItem("levult-intro-seen", "1");
+      } catch {}
+    };
+    const mark = logo.current;
+    const tl = gsap.timeline();
+    tl.fromTo(
+      mark?.querySelector("svg") ?? {},
+      { clipPath: "inset(0% 100% 0% 0%)" },
+      { clipPath: "inset(0% 0% 0% 0%)", duration: 0.9, ease: "expo.out" },
+      0.15,
+    )
+      .to(mark, { opacity: 0, scale: 0.9, duration: 0.45, ease: "power2.in" }, 1.1)
+      .add(() => openFrom(window.innerWidth / 2, window.innerHeight * 0.55, 1.4, done), 1.2);
+    return () => {
+      tl.kill();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -167,6 +180,9 @@ export function InkTransition() {
       <style dangerouslySetInnerHTML={{ __html: css }} />
       {/* Solid ink before scripts run, for the first-visit opening. */}
       <div ref={cover} aria-hidden="true" className="ink-cover fixed inset-0 z-[81] bg-ink" style={{ display: "none" }} />
+      <div ref={logo} aria-hidden="true" className="ink-logo fixed inset-0 z-[82] place-items-center text-ground" style={{ display: "none" }}>
+        <Wordmark title="" className="h-auto w-[min(56vw,420px)]" />
+      </div>
       <svg
         ref={svg}
         aria-hidden="true"
