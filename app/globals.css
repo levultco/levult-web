@@ -1,26 +1,200 @@
 @import "tailwindcss";
 
+/* ---------- Tokens ---------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ground: #ecebe7;
+  --ground-2: #e2e0da;
+  --ink: #141210;
+  --ink-soft: #57524b;
+  --paryup: #e8689a;
+  --oposalud: #0f8f6e;
+
+  --margin: clamp(20px, 2.6vw, 40px);
+  --gap-section: clamp(140px, 16vw, 240px);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --t-press: 140ms;
+  --t-hover: 200ms;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ground: var(--ground);
+  --color-ground-2: var(--ground-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-paryup: var(--paryup);
+  --color-oposalud: var(--oposalud);
+  --font-sans: var(--font-geist);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ---------- Base ---------- */
+html {
+  background: var(--ground);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+}
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-geist), system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--ground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.frame {
+  padding-inline: var(--margin);
+}
+
+.display {
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.9;
+}
+
+/* ---------- Reveal system ----------
+   Hidden only once JS has marked the document, so content never
+   stays hidden when scripts fail. */
+html.js [data-reveal]:not([data-reveal="lines"]) {
+  opacity: 0;
+  transform: translateY(28px);
+}
+html.js [data-reveal="lines"] .line-inner {
+  transform: translateY(110%);
+}
+.line {
+  display: inline-block;
+  vertical-align: top;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+.line-inner {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* Words that fill with ink as the reader scrolls past them. */
+html.js [data-scrub] .w {
+  opacity: 0.16;
+}
+
+/* ---------- Buttons & links ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+  height: 52px;
+  padding: 0 24px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--ground);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition:
+    transform var(--t-press) var(--ease-out),
+    background-color var(--t-hover) ease;
+}
+.btn:active {
+  transform: scale(0.96);
+}
+.btn .arrow {
+  transition: transform 320ms var(--ease-out);
+}
+.btn:hover .arrow {
+  transform: translateX(4px);
+}
+
+.link {
+  position: relative;
+  display: inline-block;
+}
+.link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 0.08em;
+  min-height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 450ms var(--ease-out);
+}
+.link:hover::after,
+.link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Rolling label: the text slides up and is replaced by its copy. */
+.roll {
+  display: inline-grid;
+  overflow: hidden;
+}
+.roll > span {
+  grid-area: 1 / 1;
+  transition: transform 520ms var(--ease-expo);
+}
+.roll > span:last-child {
+  transform: translateY(105%);
+}
+a:hover .roll > span:first-child,
+button:hover .roll > span:first-child,
+a:focus-visible .roll > span:first-child {
+  transform: translateY(-105%);
+}
+a:hover .roll > span:last-child,
+button:hover .roll > span:last-child,
+a:focus-visible .roll > span:last-child {
+  transform: translateY(0);
+}
+
+/* ---------- ParyUp interface (its own conventions, inside data-ui) ---------- */
+.pu-fade { background: linear-gradient(to bottom, transparent 30%, #000 100%); } /* taste-skill-ignore: the app's own glow fade */
+.pu-scrim { background: linear-gradient(to bottom, transparent, rgb(0 0 0 / 0.78)); } /* taste-skill-ignore: the app's own poster scrim */
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html.js [data-reveal]:not([data-reveal="lines"]) {
+    opacity: 1;
+    transform: none;
+  }
+  html.js [data-reveal="lines"] .line-inner {
+    transform: none;
+  }
+  html.js [data-scrub] .w {
+    opacity: 1;
+  }
+  .btn,
+  .btn .arrow,
+  .link::after,
+  .roll > span {
+    transition: none;
+  }
 }
