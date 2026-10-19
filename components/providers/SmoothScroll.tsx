@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -33,6 +34,14 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       window.__lenis = undefined;
     };
   }, []);
+
+  // A new page starts at its top; Lenis keeps its own scroll target, so reset it.
+  const pathname = usePathname();
+  useEffect(() => {
+    if (window.location.hash) return;
+    window.__lenis?.scrollTo(0, { immediate: true, force: true });
+    ScrollTrigger.refresh();
+  }, [pathname]);
 
   return <>{children}</>;
 }

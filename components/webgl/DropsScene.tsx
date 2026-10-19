@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { poseAt } from "@/lib/scene";
+import { poseAt, type SceneSection } from "@/lib/scene";
 import { fragment, vertex } from "./shaders";
 
 const COLORS = {
@@ -60,11 +60,16 @@ export function DropsScene() {
     quad.frustumCulled = false;
     scene.add(quad);
 
-    let sections: { id: string; top: number; bottom: number }[] = [];
+    let sections: SceneSection[] = [];
     const measure = () => {
       sections = Array.from(document.querySelectorAll<HTMLElement>("[data-scene]")).map((s) => {
         const r = s.getBoundingClientRect();
-        return { id: s.dataset.scene!, top: r.top + window.scrollY, bottom: r.bottom + window.scrollY };
+        return {
+          id: s.dataset.scene!,
+          top: r.top + window.scrollY,
+          bottom: r.bottom + window.scrollY,
+          dark: !!s.closest(".theme-dark"),
+        };
       });
     };
 
@@ -106,7 +111,7 @@ export function DropsScene() {
       const unit = Math.min(HALF_H, halfW * 1.25);
 
       const target = poseAt(window.scrollY, window.innerHeight, sections, narrowQuery.matches);
-      const k = first || reduce ? 1 : 1 - Math.exp(-dt * 4.5);
+      const k = first || reduce ? 1 : 1 - Math.exp(-dt * 7);
       first = false;
       cur.ax += (target.a.x - cur.ax) * k;
       cur.ay += (target.a.y - cur.ay) * k;

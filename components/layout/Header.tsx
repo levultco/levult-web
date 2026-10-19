@@ -1,23 +1,26 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { nav } from "@/lib/content";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { nav, contactEmail } from "@/lib/content";
+import { products } from "@/lib/products";
 import { Roll } from "@/components/ui/Roll";
 
 export function Header() {
   const [hidden, setHidden] = useState(false);
-  const [solid, setSolid] = useState(false);
   const [open, setOpen] = useState(false);
   const last = useRef(0);
+  const pathname = usePathname();
+
+  useEffect(() => setOpen(false), [pathname]);
 
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      setSolid(y > window.innerHeight * 0.6);
-      setHidden(y > last.current && y > 240);
+      setHidden(y > last.current && y > 200);
       last.current = y;
     };
-    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -30,73 +33,117 @@ export function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const goTo = (e: React.MouseEvent, href: string) => {
-    const lenis = window.__lenis;
+  // On the home page, hash links glide there instead of jumping.
+  const go = (e: React.MouseEvent, href: string) => {
     setOpen(false);
-    if (!lenis) return;
+    const hash = href.startsWith("/#") ? href.slice(1) : null;
+    if (!hash || pathname !== "/") return;
+    const lenis = window.__lenis;
     e.preventDefault();
-    lenis.start();
-    lenis.scrollTo(href, { duration: 1.4 });
+    if (lenis) {
+      lenis.start();
+      lenis.scrollTo(hash, { duration: 1.4 });
+    } else {
+      document.querySelector(hash)?.scrollIntoView();
+    }
   };
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-[transform,background-color] duration-500 ease-[cubic-bezier(.22,1,.36,1)] ${
-        hidden && !open ? "-translate-y-full" : "translate-y-0"
-      } ${solid || open ? "bg-ground" : "bg-transparent"}`}
-    >
-      <div className="frame flex h-[72px] items-center justify-between gap-6 md:h-[84px]">
-        <a
-          href="#top"
-          className="text-[26px] font-medium tracking-[-0.06em]"
+    <>
+      {/* The wordmark sits on its own layer so it can invert against whatever
+          ground it crosses: black on white, white on black. */}
+      <div
+        className={`frame pointer-events-none fixed left-0 top-0 z-50 flex h-[84px] items-center mix-blend-difference transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] md:h-[104px] ${
+          hidden && !open ? "-translate-y-[120%]" : "translate-y-0"
+        }`}
+      >
+        <Link
+          href="/"
+          className="pointer-events-auto text-[28px] font-medium tracking-[-0.06em] text-white md:text-[32px]"
           aria-label="Levult, inicio"
         >
           levult
-        </a>
-
-        <nav aria-label="Principal" className="hidden items-center gap-9 md:flex">
-          {nav.map((item) => (
-            <a key={item.href} href={item.href} className="text-[16px] font-medium">
-              <Roll>{item.label}</Roll>
-            </a>
-          ))}
-        </nav>
-
-        <button
-          type="button"
-          className="relative h-11 px-1 text-[16px] font-medium md:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? "Cerrar" : "Menú"}
-        </button>
+        </Link>
       </div>
 
-      <div
-        id="mobile-menu"
-        className={`frame fixed inset-x-0 top-[72px] bottom-0 flex flex-col justify-between bg-ground pb-10 pt-8 transition-[opacity,visibility] duration-300 md:hidden ${
-          open ? "visible opacity-100" : "invisible opacity-0"
+      <header
+        className={`frame pointer-events-none fixed right-0 top-0 z-50 flex h-[84px] items-center transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] md:h-[104px] ${
+          hidden && !open ? "-translate-y-[120%]" : "translate-y-0"
         }`}
       >
-        <ul className="flex flex-col gap-2">
-          {nav.map((item, i) => (
-            <li
-              key={item.href}
-              className="transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)]"
-              style={{
-                transform: open ? "none" : "translateY(24px)",
-                transitionDelay: open ? `${80 + i * 60}ms` : "0ms",
-              }}
-            >
-              <a href={item.href} onClick={(e) => goTo(e, item.href)} className="block py-1 text-[44px] font-medium leading-tight tracking-[-0.04em]">
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-        <p className="text-[16px] text-ink-soft">La compañía detrás de ParyUp y Oposalud</p>
+        <div className="pointer-events-auto flex items-center gap-2.5">
+          <a href="/#contacto" onClick={(e) => go(e, "/#contacto")} className={`pill pill--dark hidden !h-12 transition-opacity ${open ? "pointer-events-none opacity-0" : "sm:inline-flex"}`}>
+            <Roll>Hablemos</Roll>
+            <span aria-hidden="true" className="dot" />
+          </a>
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-controls="site-menu"
+            className={`pill !h-12 ${open ? "bg-ground text-ink" : "pill--light"}`}
+          >
+            <Roll>{open ? "Cerrar" : "Menú"}</Roll>
+            <span aria-hidden="true" className="flex gap-[3px]">
+              <span className="dot" />
+              <span className="dot" />
+            </span>
+          </button>
+        </div>
+      </header>
+
+      <div
+        id="site-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menú"
+        className={`theme-dark fixed inset-0 z-40 flex flex-col justify-between overflow-y-auto pb-10 pt-[120px] transition-[clip-path] duration-700 ease-[cubic-bezier(.76,0,.24,1)] md:pt-[140px] ${
+          open ? "[clip-path:inset(0_0_0_0)]" : "pointer-events-none [clip-path:inset(0_0_100%_0)]"
+        }`}
+      >
+        <div className="frame grid gap-12 md:grid-cols-12 md:gap-6">
+          <ul className="md:col-span-7">
+            {nav.map((item, i) => (
+              <li
+                key={item.href}
+                className="overflow-hidden"
+                style={{
+                  transition: "transform 700ms cubic-bezier(.16,1,.3,1)",
+                  transitionDelay: open ? `${150 + i * 60}ms` : "0ms",
+                  transform: open ? "none" : "translateY(40px)",
+                }}
+              >
+                <Link
+                  href={item.href}
+                  onClick={(e) => go(e, item.href)}
+                  className="block py-1 text-[clamp(48px,7vw,104px)] font-medium leading-[1] tracking-[-0.05em] transition-opacity duration-300 hover:opacity-60"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className="md:col-span-4 md:col-start-9">
+            <p className="text-[15px] uppercase text-ink-soft-dark">Trabajos destacados</p>
+            <ul className="mt-5 grid gap-2">
+              {products.map((p) => (
+                <li key={p.slug}>
+                  <Link href={`/features/${p.slug}`} className="flex items-baseline justify-between gap-4 py-1 text-[26px] font-medium tracking-[-0.03em]">
+                    <Roll>{p.name}</Roll>
+                    <span className="text-[15px] font-normal text-ink-soft-dark">{p.category}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div className="frame mt-16 flex flex-wrap items-end justify-between gap-6">
+          <a href={`mailto:${contactEmail}`} className="text-[clamp(24px,2.6vw,40px)] font-medium tracking-[-0.04em]">
+            <Roll>{contactEmail}</Roll>
+          </a>
+          <p className="text-[15px] text-ink-soft-dark">© 2026 Levult</p>
+        </div>
       </div>
-    </header>
+    </>
   );
 }

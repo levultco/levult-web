@@ -1,5 +1,5 @@
 import { SplitText } from "@/components/ui/SplitText";
-import { Roll } from "@/components/ui/Roll";
+import { Pill } from "@/components/ui/Pill";
 
 export function Hero() {
   return (
@@ -11,29 +11,18 @@ export function Hero() {
     >
       <SplitText
         as="h1"
-        text="Hacemos apps para la vida real."
-        className="display max-w-[9ch] text-[clamp(56px,10.4vw,176px)] md:max-w-[10ch]"
+        text="Creamos lo que viene."
+        className="display max-w-[11ch] text-[clamp(52px,9vw,156px)]"
       />
 
       <div className="mt-10 grid gap-8 md:mt-14 md:grid-cols-12 md:items-end md:gap-6">
-        <p data-reveal className="max-w-[30ch] text-[clamp(19px,1.5vw,23px)] leading-[1.35] md:col-span-5">
-          Levult es la compañía detrás de ParyUp y Oposalud. Las diseñamos, las construimos y las hacemos crecer.
+        <p data-reveal className="max-w-[32ch] text-[clamp(18px,1.4vw,22px)] leading-[1.4] md:col-span-5">
+          Levult es una empresa tecnológica que diseña, desarrolla y hace crecer sus propios productos digitales. De la primera idea al mundo real.
         </p>
-
-        <ul data-reveal className="flex gap-8 text-[clamp(19px,1.5vw,23px)] font-medium md:col-span-4 md:col-start-9 md:justify-end">
-          <li>
-            <a href="#paryup" className="inline-flex items-center gap-2.5">
-              <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-paryup" />
-              <Roll>ParyUp</Roll>
-            </a>
-          </li>
-          <li>
-            <a href="#oposalud" className="inline-flex items-center gap-2.5">
-              <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-oposalud" />
-              <Roll>Oposalud</Roll>
-            </a>
-          </li>
-        </ul>
+        <div data-reveal className="flex flex-wrap gap-2.5 md:col-span-6 md:col-start-7 md:justify-end">
+          <Pill href="/#destacados" icon="arrow">Ver trabajos</Pill>
+          <Pill href="/#compania" tone="light">La compañía</Pill>
+        </div>
       </div>
     </section>
   );

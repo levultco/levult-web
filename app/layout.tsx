@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import "./globals.css";
 
 const geist = Geist({
@@ -10,13 +12,13 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Levult — La compañía detrás de ParyUp y Oposalud",
+  title: { default: "Levult — Creamos lo que viene", template: "%s — Levult" },
   description:
-    "Levult crea y opera apps para la vida real: ParyUp, para quedar con gente nueva, y Oposalud, para preparar oposiciones sanitarias.",
+    "Levult crea, lanza y hace crecer sus propias apps y webs, como ParyUp y Oposalud.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ecebe7",
+  themeColor: "#f0f0f2",
 };
 
 // Marks the document before first paint so reveal styles only apply when
@@ -34,7 +36,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
       <body>
-        <SmoothScroll>{children}</SmoothScroll>
+        <SmoothScroll>
+          <Header />
+          {children}
+          <Footer />
+        </SmoothScroll>
       </body>
     </html>
   );

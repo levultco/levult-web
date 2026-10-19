@@ -52,7 +52,8 @@ export function Choreography() {
           opacity: 1,
           ease: "none",
           stagger: 0.1,
-          scrollTrigger: { trigger: el, start: "top 78%", end: "bottom 50%", scrub: true },
+          // Measured on the section: the statement itself is sticky.
+          scrollTrigger: { trigger: el.closest("section"), start: "top 60%", end: "62% bottom", scrub: true },
         });
       });
 

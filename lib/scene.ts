@@ -7,68 +7,57 @@
 export type Drop = { x: number; y: number; r: number };
 export type Pose = { a: Drop; b: Drop; tint: number; m?: { a: Drop; b: Drop } };
 
+// Push a pose off the screen sideways: whatever sits left leaves left,
+// whatever sits right leaves right. Drops keep their size as they go.
+const offscreen = (d: Drop): Drop => ({ ...d, x: d.x < 0 ? -1.9 : 1.9 });
+const exit = (p: Pose): Pose => ({
+  a: offscreen(p.a),
+  b: offscreen(p.b),
+  tint: p.tint,
+  m: p.m && { a: offscreen(p.m.a), b: offscreen(p.m.b) },
+});
+
+// The fluid lives on the white stretches at the page's two ends: the opening
+// and statement, then the invitation to talk and the footer. Before the black
+// panel reaches them the drops slide out to the sides, and they slide back in
+// only once the panel has left the screen.
+const hero: Pose = {
+  a: { x: 0.6, y: 0.16, r: 0.42 },
+  b: { x: 0.8, y: -0.22, r: 0.32 },
+  tint: 0,
+  m: { a: { x: 0.1, y: 0.42, r: 0.4 }, b: { x: 0.32, y: 0.26, r: 0.3 } },
+};
+// While the statement is read the form parts in two, one drop on each side.
+const statement: Pose = {
+  a: { x: -0.8, y: 0.48, r: 0.26 },
+  b: { x: 0.8, y: -0.48, r: 0.3 },
+  tint: 0,
+  m: { a: { x: -0.72, y: 0.6, r: 0.26 }, b: { x: 0.72, y: -0.7, r: 0.28 } },
+};
+const contacto: Pose = {
+  a: { x: 0.6, y: 0.06, r: 0.46 },
+  b: { x: 0.74, y: -0.14, r: 0.36 },
+  tint: 0,
+  m: { a: { x: 0.2, y: -0.8, r: 0.34 }, b: { x: 0.42, y: -0.92, r: 0.24 } },
+};
+// At the very end the drops fuse again and settle into the giant wordmark.
+const footer: Pose = {
+  a: { x: 0.08, y: -0.4, r: 0.42 },
+  b: { x: 0.2, y: -0.54, r: 0.3 },
+  tint: 0,
+  m: { a: { x: 0.12, y: -0.56, r: 0.24 }, b: { x: 0.3, y: -0.66, r: 0.18 } },
+};
+
 export const poses: Record<string, Pose> = {
-  // One company: both drops fused into a single form.
-  hero: {
-    a: { x: 0.6, y: 0.3, r: 0.42 },
-    b: { x: 0.8, y: -0.08, r: 0.32 },
-    tint: 0,
-    m: { a: { x: 0.1, y: 0.42, r: 0.4 }, b: { x: 0.32, y: 0.26, r: 0.3 } },
-  },
-  // Two apps: the form splits and each drop takes its colour.
-  statement: {
-    a: { x: -0.86, y: -0.56, r: 0.28 },
-    b: { x: 0.86, y: 0.56, r: 0.26 },
-    tint: 1,
-    m: { a: { x: -0.72, y: -0.7, r: 0.28 }, b: { x: 0.7, y: 0.66, r: 0.3 } },
-  },
-  // Each app: its drop waits under the giant name, then sits behind the live
-  // phone. The other drop shrinks to nothing where it is (r 0), so no drop
-  // ever sweeps across the text.
-  "paryup-intro": {
-    a: { x: -0.58, y: -0.5, r: 0.34 },
-    b: { x: 0.9, y: 0.5, r: 0 },
-    tint: 1,
-    m: { a: { x: 0.72, y: -0.6, r: 0.3 }, b: { x: 0.7, y: 0.66, r: 0 } },
-  },
-  paryup: {
-    a: { x: -0.58, y: -0.02, r: 0.5 },
-    b: { x: 0.9, y: -0.5, r: 0 },
-    tint: 1,
-    m: { a: { x: 0.95, y: 0.8, r: 0.26 }, b: { x: -0.7, y: 0.6, r: 0 } },
-  },
-  "oposalud-intro": {
-    a: { x: -0.58, y: -0.02, r: 0 },
-    b: { x: 0.58, y: -0.5, r: 0.34 },
-    tint: 1,
-    m: { a: { x: 0.95, y: 0.8, r: 0 }, b: { x: -0.72, y: -0.6, r: 0.3 } },
-  },
-  oposalud: {
-    a: { x: 0.6, y: 0.1, r: 0 },
-    b: { x: 0.58, y: -0.02, r: 0.5 },
-    tint: 1,
-    m: { a: { x: 0.5, y: -0.62, r: 0 }, b: { x: -0.95, y: 0.8, r: 0.26 } },
-  },
-  // Side by side again, about to rejoin.
-  compania: {
-    a: { x: 0.6, y: 0.1, r: 0.28 },
-    b: { x: 0.84, y: -0.12, r: 0.23 },
-    tint: 1,
-    m: { a: { x: 0.5, y: -0.62, r: 0.24 }, b: { x: 0.72, y: -0.78, r: 0.2 } },
-  },
-  // Back to one.
-  contacto: {
-    a: { x: 0.6, y: 0.06, r: 0.46 },
-    b: { x: 0.74, y: -0.14, r: 0.36 },
-    tint: 0,
-    m: { a: { x: 0.2, y: -0.8, r: 0.34 }, b: { x: 0.42, y: -0.92, r: 0.24 } },
-  },
-  footer: {
-    a: { x: 0.66, y: 0.5, r: 0.26 },
-    b: { x: 0.8, y: 0.36, r: 0.19 },
-    tint: 0,
-    m: { a: { x: 0.5, y: 0.5, r: 0.24 }, b: { x: 0.7, y: 0.4, r: 0.18 } },
-  },
+  hero,
+  statement,
+  // Under the black panel the drops wait off screen: first where the
+  // statement sent them, then (unseen, behind the panel) beside the contact
+  // pose so they return from the right.
+  destacados: exit(statement),
+  compania: exit(contacto),
+  contacto,
+  footer,
 };
 
 const smooth = (t: number) => t * t * (3 - 2 * t);
@@ -83,18 +72,15 @@ type Resolved = { a: Drop; b: Drop; tint: number };
 const resolve = (pose: Pose, narrow: boolean): Resolved =>
   narrow && pose.m ? { a: pose.m.a, b: pose.m.b, tint: pose.tint } : pose;
 
+export type SceneSection = { id: string; top: number; bottom: number; dark: boolean };
+
 /**
- * Each section holds its pose while it sits under the middle of the screen.
- * The hand-over to the next pose happens only around the boundary between two
- * sections, over at most 0.3 of a screen on each side, so a drop never starts
- * leaving while its section is still being read.
+ * Each section holds its pose while it sits under the middle of the screen,
+ * and hands over to the next one around their boundary. A dark section is
+ * opaque, so the hand-over is moved: drops finish leaving before its top edge
+ * comes into view, and only start returning once its bottom edge has gone.
  */
-export function poseAt(
-  scrollY: number,
-  vh: number,
-  sections: { id: string; top: number; bottom: number }[],
-  narrow: boolean,
-): Resolved {
+export function poseAt(scrollY: number, vh: number, sections: SceneSection[], narrow: boolean): Resolved {
   const pose = (i: number) => resolve(poses[sections[i].id] ?? poses.hero, narrow);
   if (!sections.length) return resolve(poses.hero, narrow);
 
@@ -102,11 +88,24 @@ export function poseAt(
   for (let i = 0; i < sections.length - 1; i++) {
     const cur = sections[i];
     const next = sections[i + 1];
-    const boundary = (cur.bottom + next.top) / 2;
-    const half = Math.min(vh * 0.3, (cur.bottom - cur.top) / 2, (next.bottom - next.top) / 2);
-    if (mid < boundary - half) return pose(i);
-    if (mid <= boundary + half) {
-      const t = smooth((mid - (boundary - half)) / (2 * half));
+    // Coming back from a dark panel the drops return quicker, so they greet the
+    // section rather than arrive halfway through it.
+    const reach = cur.dark && !next.dark ? 0.32 : 0.6;
+    const span = Math.min(vh * reach, cur.bottom - cur.top, next.bottom - next.top);
+    let start: number;
+    if (next.dark && !cur.dark) {
+      // done by the time the panel's top edge reaches the bottom of the screen
+      start = next.top - vh / 2 - vh * 0.08 - span;
+    } else if (cur.dark && !next.dark) {
+      // begin once the panel's bottom edge has left the top of the screen
+      start = cur.bottom + vh / 2;
+    } else {
+      // between two light sections, mostly once the next one has the middle
+      start = (cur.bottom + next.top) / 2 - span * 0.2;
+    }
+    if (mid < start) return pose(i);
+    if (mid <= start + span) {
+      const t = smooth((mid - start) / span);
       const p = pose(i);
       const q = pose(i + 1);
       return { a: mixDrop(p.a, q.a, t), b: mixDrop(p.b, q.b, t), tint: p.tint + (q.tint - p.tint) * t };
