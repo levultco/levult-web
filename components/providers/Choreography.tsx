@@ -3,6 +3,7 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { onReveal } from "@/lib/reveal-gate";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -34,8 +35,11 @@ export function Choreography() {
     const mm = gsap.matchMedia();
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
-      // Groups that play on load (the hero) start straight away.
-      document.querySelectorAll("[data-reveal-group='load']").forEach((g) => revealGroup(g, 0.15));
+      // Groups that play on load (the hero) start as soon as nothing covers
+      // the page: straight away, or as the intro or page curtain opens.
+      const offReveal = onReveal(() => {
+        document.querySelectorAll("[data-reveal-group='load']").forEach((g) => revealGroup(g, 0.15));
+      });
 
       document.querySelectorAll("[data-reveal-group]:not([data-reveal-group='load'])").forEach((g) => {
         ScrollTrigger.create({
@@ -59,6 +63,8 @@ export function Choreography() {
 
       // Safety net: make sure reveals are measured after fonts settle.
       document.fonts?.ready.then(() => ScrollTrigger.refresh());
+
+      return offReveal;
     });
   });
 

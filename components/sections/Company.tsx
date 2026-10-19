@@ -1,7 +1,7 @@
 import { SplitText } from "@/components/ui/SplitText";
 
 const principles = [
-  { title: "Producto propio", text: "No trabajamos por encargo: cada cosa que hacemos es nuestra y la mantenemos viva." },
+  { title: "Producto propio", text: "Todo lo que lanzamos es nuestro, y lo mantenemos vivo." },
   { title: "Lo usamos nosotros", text: "Si no lo abriríamos cada día, no sale a la calle." },
   { title: "Medimos en personas", text: "Gente que vuelve, planes que se cumplen, plazas que se aprueban. Lo demás es ruido." },
 ];
@@ -17,12 +17,12 @@ export function Company() {
       <div data-reveal-group className="frame grid grid-cols-1 gap-y-10 md:grid-cols-12 md:gap-x-6">
         <SplitText
           id="compania-title"
-          text="Una compañía pequeña que construye a largo plazo."
+          text="Construimos para quedarnos."
           className="display max-w-[13ch] text-[clamp(44px,6vw,104px)] md:col-span-8"
         />
         <p data-reveal className="max-w-[40ch] text-[18px] leading-[1.6] text-ink-soft-dark md:col-span-4 md:self-end">
-          Un equipo que diseña, programa y opera sus propios productos digitales. Lanzamos pocos y los cuidamos
-          mucho tiempo.
+          Levult diseña, desarrolla y opera sus propios productos digitales. Lanzamos menos, pero cuidamos cada
+          uno durante años.
         </p>
       </div>
 

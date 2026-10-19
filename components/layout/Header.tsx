@@ -3,14 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { nav, contactEmail } from "@/lib/content";
-import { products } from "@/lib/products";
 import { Roll } from "@/components/ui/Roll";
+import { MorphLabel, MorphIcon } from "@/components/ui/MorphLabel";
+import { SiteMenu } from "./SiteMenu";
 
 export function Header() {
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const last = useRef(0);
+  const menuButton = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
 
   useEffect(() => setOpen(false), [pathname]);
@@ -28,6 +29,9 @@ export function Header() {
   useEffect(() => {
     if (open) window.__lenis?.stop();
     else window.__lenis?.start();
+  }, [open]);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -72,78 +76,25 @@ export function Header() {
         }`}
       >
         <div className="pointer-events-auto flex items-center gap-2.5">
-          <a href="/#contacto" onClick={(e) => go(e, "/#contacto")} className={`pill pill--dark hidden !h-12 transition-opacity ${open ? "pointer-events-none opacity-0" : "sm:inline-flex"}`}>
+          <a href="/#contacto" onClick={(e) => go(e, "/#contacto")} className={`pill pill--dark hidden !h-12 ring-1 ring-white/15 transition-opacity ${open ? "pointer-events-none opacity-0" : "sm:inline-flex"}`}>
             <Roll>Hablemos</Roll>
             <span aria-hidden="true" className="dot" />
           </a>
           <button
+            ref={menuButton}
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-controls="site-menu"
             className={`pill !h-12 ${open ? "bg-ground text-ink" : "pill--light"}`}
           >
-            <Roll>{open ? "Cerrar" : "Menú"}</Roll>
-            <span aria-hidden="true" className="flex gap-[3px]">
-              <span className="dot" />
-              <span className="dot" />
-            </span>
+            <MorphLabel text={open ? "Cerrar" : "Menú"} />
+            <MorphIcon open={open} />
           </button>
         </div>
       </header>
 
-      <div
-        id="site-menu"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Menú"
-        className={`theme-dark fixed inset-0 z-40 flex flex-col justify-between overflow-y-auto pb-10 pt-[120px] transition-[clip-path] duration-700 ease-[cubic-bezier(.76,0,.24,1)] md:pt-[140px] ${
-          open ? "[clip-path:inset(0_0_0_0)]" : "pointer-events-none [clip-path:inset(0_0_100%_0)]"
-        }`}
-      >
-        <div className="frame grid gap-12 md:grid-cols-12 md:gap-6">
-          <ul className="md:col-span-7">
-            {nav.map((item, i) => (
-              <li
-                key={item.href}
-                className="overflow-hidden"
-                style={{
-                  transition: "transform 700ms cubic-bezier(.16,1,.3,1)",
-                  transitionDelay: open ? `${150 + i * 60}ms` : "0ms",
-                  transform: open ? "none" : "translateY(40px)",
-                }}
-              >
-                <Link
-                  href={item.href}
-                  onClick={(e) => go(e, item.href)}
-                  className="block py-1 text-[clamp(48px,7vw,104px)] font-medium leading-[1] tracking-[-0.05em] transition-opacity duration-300 hover:opacity-60"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <div className="md:col-span-4 md:col-start-9">
-            <p className="text-[15px] uppercase text-ink-soft-dark">Trabajos destacados</p>
-            <ul className="mt-5 grid gap-2">
-              {products.map((p) => (
-                <li key={p.slug}>
-                  <Link href={`/features/${p.slug}`} className="flex items-baseline justify-between gap-4 py-1 text-[26px] font-medium tracking-[-0.03em]">
-                    <Roll>{p.name}</Roll>
-                    <span className="text-[15px] font-normal text-ink-soft-dark">{p.category}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <div className="frame mt-16 flex flex-wrap items-end justify-between gap-6">
-          <a href={`mailto:${contactEmail}`} className="text-[clamp(24px,2.6vw,40px)] font-medium tracking-[-0.04em]">
-            <Roll>{contactEmail}</Roll>
-          </a>
-          <p className="text-[15px] text-ink-soft-dark">© 2026 Levult</p>
-        </div>
-      </div>
+      <SiteMenu open={open} anchor={menuButton} onNavigate={go} />
     </>
   );
 }

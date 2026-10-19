@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { products } from "@/lib/products";
 import { ProductDevice } from "@/components/product/ProductDevice";
+import { DeviceStage } from "@/components/product/DeviceStage";
 import { Pill } from "@/components/ui/Pill";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -47,9 +48,9 @@ export function ProductStack() {
           <article
             data-stack-inner
             aria-labelledby={`card-${p.slug}`}
-            className="grid origin-top overflow-hidden rounded-[28px] bg-ink-2 md:h-[76svh] md:min-h-[560px] md:grid-cols-12"
+            className="grid origin-top gap-8 bg-ink md:h-[76svh] md:min-h-[560px] md:grid-cols-12 md:gap-6"
           >
-            <div className="flex flex-col justify-between gap-10 p-7 md:col-span-5 md:p-10">
+            <div className="flex flex-col justify-between gap-10 md:col-span-5 md:py-2">
               <div>
                 <p className="text-[15px] uppercase text-ink-soft-dark">
                   {p.kind} · {p.category} · {p.year}
@@ -61,7 +62,7 @@ export function ProductStack() {
               </div>
               <div>
                 <ul className="mb-8 grid gap-2 text-[16px] text-ink-soft-dark">
-                  {p.features.map((f) => (
+                  {p.features.slice(0, 4).map((f) => (
                     <li key={f.title}>{f.title}</li>
                   ))}
                 </ul>
@@ -70,20 +71,15 @@ export function ProductStack() {
                 </Pill>
               </div>
             </div>
-            <div className="p-2.5 md:col-span-7 md:p-3">
-              <Link
-                href={`/features/${p.slug}`}
-                tabIndex={-1}
-                aria-hidden="true"
-                className={`${p.stage} group relative flex h-[min(66svh,520px)] items-end justify-center overflow-hidden rounded-[20px] md:h-full`}
-              >
-                <div className="w-[min(300px,80%)] translate-y-[14%] md:w-[min(300px,62%)] transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:translate-y-[9%]">
+            <Link href={`/features/${p.slug}`} tabIndex={-1} aria-hidden="true" className="group block md:col-span-7">
+              <DeviceStage product={p} className="flex h-[min(66svh,520px)] rounded-[24px] items-end justify-center md:h-full">
+                <div className="w-[min(320px,80%)] translate-y-[16%] transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:translate-y-[11%] md:w-[min(340px,56%)]">
                   <div className="pointer-events-none" inert>
                     <ProductDevice product={p} />
                   </div>
                 </div>
-              </Link>
-            </div>
+              </DeviceStage>
+            </Link>
           </article>
         </li>
       ))}

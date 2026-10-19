@@ -5,7 +5,7 @@ export const nav = [
   { label: "Contacto", href: "/#contacto" },
 ];
 
-export const contactEmail = "hola@levult.com";
+export const contactEmail = "partners@levult.com";
 
 export type Question = {
   q: string;

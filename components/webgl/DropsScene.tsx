@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { poseAt, type SceneSection } from "@/lib/scene";
 import { fragment, vertex } from "./shaders";
+import { onReveal } from "@/lib/reveal-gate";
 
 const COLORS = {
   paryupTop: "#ffcc3d",
@@ -11,7 +12,7 @@ const COLORS = {
   paryupLow: "#e86aae",
   oposalud: "#0f8f6e",
   ink: "#1c1a18",
-  ground: "#ecebe7",
+  ground: "#eaecf0",
 };
 
 const HALF_H = 4 * 0.4142; // visible half-height at z = 0
@@ -99,7 +100,11 @@ export function DropsScene() {
     let raf = 0;
     let visible = true;
     const clock = new THREE.Clock();
-    const start = performance.now() + 250;
+    // The drops grow once nothing covers the page (intro or page curtain).
+    let start = Infinity;
+    const offReveal = onReveal(() => {
+      start = performance.now() + 150;
+    });
 
     const frame = () => {
       raf = requestAnimationFrame(frame);
@@ -148,6 +153,7 @@ export function DropsScene() {
     const late = window.setTimeout(measure, 1200);
 
     return () => {
+      offReveal();
       cancelAnimationFrame(raf);
       window.clearTimeout(late);
       window.removeEventListener("resize", resize);

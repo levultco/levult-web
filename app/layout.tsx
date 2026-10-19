@@ -3,6 +3,8 @@ import { Geist } from "next/font/google";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { ScrollIndicator } from "@/components/layout/ScrollIndicator";
+import { InkTransition } from "@/components/layout/InkTransition";
 import "./globals.css";
 
 const geist = Geist({
@@ -18,12 +20,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f0f0f2",
+  themeColor: "#eaecf0",
 };
 
-// Marks the document before first paint so reveal styles only apply when
-// scripts run; falls back to visible content if the app never boots.
-const bootScript = `document.documentElement.classList.add('js');setTimeout(function(){if(!window.__levultReady)document.documentElement.classList.remove('js')},3500);`;
+// Runs before first paint. Marks the document so reveal styles only apply when
+// scripts run, and decides whether the intro plays (first visit this session,
+// motion allowed). If the app never boots, both are undone so content shows.
+const bootScript = `(function(){var d=document.documentElement;d.classList.add('js');try{if(!sessionStorage.getItem('levult-intro-seen')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('intro')}catch(e){}setTimeout(function(){if(!window.__levultReady){d.classList.remove('js');d.classList.remove('intro')}},3500)})();`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -37,7 +40,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body>
         <SmoothScroll>
+          <InkTransition />
           <Header />
+          <ScrollIndicator />
           {children}
           <Footer />
         </SmoothScroll>

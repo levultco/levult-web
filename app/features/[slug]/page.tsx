@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { products, getProduct } from "@/lib/products";
+import { products, getProduct, domainOf } from "@/lib/products";
 import { Choreography } from "@/components/providers/Choreography";
 import { ProductDevice } from "@/components/product/ProductDevice";
+import { DeviceStage } from "@/components/product/DeviceStage";
+import { NextWork } from "@/components/product/NextWork";
+import { WebsiteLink } from "@/components/product/WebsiteLink";
 import { SplitText } from "@/components/ui/SplitText";
 import { Arrow } from "@/components/ui/Arrow";
 import { Pill } from "@/components/ui/Pill";
@@ -22,18 +25,18 @@ export default async function ProductPage({ params }: PageProps<"/features/[slug
   const product = getProduct(slug);
   if (!product) notFound();
 
-  const index = products.indexOf(product);
-  const next = products[(index + 1) % products.length];
+  const next = products[(products.indexOf(product) + 1) % products.length];
   const facts = [
     { term: "Tipo", detail: product.kind },
     { term: "Categoría", detail: product.category },
     { term: "Plataformas", detail: product.platforms },
-    { term: "Desde", detail: product.year },
+    { term: "Estado", detail: product.status },
   ];
 
   return (
     <>
       <main>
+        {/* Opening: the name, what it is, the facts and the way to the real thing. */}
         <section data-reveal-group="load" aria-labelledby="product-title" className="frame pb-16 pt-[clamp(140px,16vw,220px)]">
           <Link href="/#destacados" className="inline-flex items-center gap-2 text-[15px] uppercase">
             <Arrow className="rotate-180" />
@@ -41,9 +44,16 @@ export default async function ProductPage({ params }: PageProps<"/features/[slug
           </Link>
           <SplitText as="h1" id="product-title" text={product.name} className="display mt-8 text-[clamp(72px,15vw,260px)] leading-[0.82]" />
           <div className="mt-12 grid gap-10 md:grid-cols-12 md:gap-6">
-            <p data-reveal className="text-[clamp(24px,2.4vw,38px)] font-medium leading-[1.15] tracking-[-0.03em] md:col-span-6">
-              {product.lead}
-            </p>
+            <div className="md:col-span-6">
+              <p data-reveal className="text-[clamp(24px,2.4vw,38px)] font-medium leading-[1.15] tracking-[-0.03em]">
+                {product.lead}
+              </p>
+              <div data-reveal className="mt-10 flex flex-wrap gap-2.5">
+                <Pill href={product.url} icon="external">
+                  {`Visitar ${domainOf(product.url)}`}
+                </Pill>
+              </div>
+            </div>
             <dl data-reveal className="grid grid-cols-2 gap-x-6 gap-y-6 md:col-span-5 md:col-start-8">
               {facts.map((f) => (
                 <div key={f.term}>
@@ -55,12 +65,15 @@ export default async function ProductPage({ params }: PageProps<"/features/[slug
           </div>
         </section>
 
+        {/* The live interface, lit by the brand. */}
         <section aria-label={`${product.name} en funcionamiento`} className="frame">
           <div data-reveal-group>
-            <div data-reveal className={`${product.stage} relative grid min-h-[min(92svh,900px)] place-items-center overflow-hidden rounded-[28px] py-16`}>
-              <div className="w-[min(320px,78vw,42svh)]">
-                <ProductDevice product={product} />
-              </div>
+            <div data-reveal>
+              <DeviceStage product={product} className="grid min-h-[min(92svh,900px)] place-items-center rounded-[28px] py-16">
+                <div className="w-[min(320px,78vw,42svh)]">
+                  <ProductDevice product={product} />
+                </div>
+              </DeviceStage>
             </div>
             {product.hint && (
               <p data-reveal className="mt-5 text-[15px] uppercase text-ink-soft">
@@ -70,6 +83,7 @@ export default async function ProductPage({ params }: PageProps<"/features/[slug
           </div>
         </section>
 
+        {/* What it does, and for whom. */}
         <section aria-labelledby="product-features" className="theme-dark relative z-10 mt-[var(--gap-section)] rounded-[clamp(24px,3vw,44px)] py-[var(--gap-section)]">
           <div data-reveal-group className="frame grid gap-10 md:grid-cols-12 md:gap-6">
             <h2 id="product-features" className="display text-[clamp(44px,5.4vw,92px)] md:col-span-5">
@@ -89,27 +103,24 @@ export default async function ProductPage({ params }: PageProps<"/features/[slug
               </li>
             ))}
           </ul>
+          {product.audience && (
+            <div data-reveal-group className="frame mt-20 grid gap-6 md:grid-cols-12">
+              <p data-reveal className="text-[15px] uppercase text-ink-soft-dark md:col-span-3">
+                {product.audience.title}
+              </p>
+              <ul data-reveal className="flex flex-wrap gap-2.5 md:col-span-9">
+                {product.audience.items.map((item) => (
+                  <li key={item} className="pill pill--light !h-12 normal-case">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </section>
 
-        {next.slug !== product.slug && (
-          <section aria-labelledby="next-title" className="frame py-[var(--gap-section)]">
-            <div data-reveal-group>
-              <p data-reveal className="text-[15px] uppercase text-ink-soft">Siguiente trabajo</p>
-              <Link href={`/features/${next.slug}`} className="group mt-4 flex flex-wrap items-end justify-between gap-6">
-                <span id="next-title" className="display text-[clamp(64px,11vw,190px)] transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:translate-x-4">
-                  {next.name}
-                </span>
-                <span className="pill pill--dark mb-4">
-                  Ver trabajo
-                  <Arrow />
-                </span>
-              </Link>
-            </div>
-            <div data-reveal-group className="mt-16 flex">
-              <Pill href="/#contacto" tone="light">Hablemos</Pill>
-            </div>
-          </section>
-        )}
+        <WebsiteLink product={product} />
+        {next.slug !== product.slug && <NextWork product={next} />}
       </main>
       <Choreography />
     </>
