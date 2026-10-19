@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ScrollIndicator } from "@/components/layout/ScrollIndicator";
 import { InkTransition } from "@/components/layout/InkTransition";
+import { site } from "@/lib/site";
 import "./globals.css";
 
 const geist = Geist({
@@ -14,13 +15,38 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Levult — Creamos lo que viene", template: "%s — Levult" },
-  description:
-    "Levult crea, lanza y hace crecer sus propias apps y webs, como ParyUp y Oposalud.",
+  metadataBase: new URL(site.url),
+  title: { default: site.title, template: "%s — Levult" },
+  description: site.description,
+  applicationName: site.name,
+  authors: [{ name: site.name, url: site.url }],
+  creator: site.name,
+  publisher: site.name,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: site.locale,
+    url: "/",
+    siteName: site.name,
+    title: site.title,
+    description: site.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: site.title,
+    description: site.description,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+  },
+  formatDetection: { telephone: false, address: false, email: false },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#eaecf0",
+  themeColor: site.colors.ground,
+  colorScheme: "light",
 };
 
 // Runs before first paint. Marks the document so reveal styles only apply when

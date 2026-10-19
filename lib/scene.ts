@@ -40,22 +40,29 @@ const contacto: Pose = {
   tint: 0,
   m: { a: { x: 0.2, y: -0.8, r: 0.34 }, b: { x: 0.42, y: -0.92, r: 0.24 } },
 };
-// At the very end the drops fuse again and settle into the giant wordmark.
+// At the very end the drops fuse again and settle on the end of the giant
+// wordmark, over the "lt", so the name still reads whole.
 const footer: Pose = {
-  a: { x: 0.08, y: -0.4, r: 0.42 },
-  b: { x: 0.2, y: -0.54, r: 0.3 },
+  a: { x: 0.56, y: -0.34, r: 0.34 },
+  b: { x: 0.7, y: -0.5, r: 0.24 },
   tint: 0,
-  m: { a: { x: 0.12, y: -0.56, r: 0.24 }, b: { x: 0.3, y: -0.66, r: 0.18 } },
+  m: { a: { x: 0.52, y: -0.58, r: 0.22 }, b: { x: 0.7, y: -0.68, r: 0.16 } },
 };
 
 export const poses: Record<string, Pose> = {
   hero,
   statement,
   // Under the black panel the drops wait off screen: first where the
-  // statement sent them, then (unseen, behind the panel) beside the contact
-  // pose so they return from the right.
+  // statement sent them, then (unseen, behind the panel) below and right of
+  // the contact pose, so they rise in through the white that opens up under
+  // the panel's bottom edge.
   destacados: exit(statement),
-  compania: exit(contacto),
+  compania: {
+    a: { x: 1.45, y: -1.1, r: contacto.a.r },
+    b: { x: 1.6, y: -1.2, r: contacto.b.r },
+    tint: 0,
+    m: { a: { x: 1.45, y: -1.1, r: contacto.m!.a.r }, b: { x: 1.6, y: -1.2, r: contacto.m!.b.r } },
+  },
   contacto,
   footer,
 };
@@ -88,19 +95,22 @@ export function poseAt(scrollY: number, vh: number, sections: SceneSection[], na
   for (let i = 0; i < sections.length - 1; i++) {
     const cur = sections[i];
     const next = sections[i + 1];
-    // Coming back from a dark panel the drops return quicker, so they greet the
-    // section rather than arrive halfway through it.
-    const reach = cur.dark && !next.dark ? 0.32 : 0.6;
-    const span = Math.min(vh * reach, cur.bottom - cur.top, next.bottom - next.top);
+    let span: number;
     let start: number;
+    const room = Math.min(cur.bottom - cur.top, next.bottom - next.top);
     if (next.dark && !cur.dark) {
-      // done by the time the panel's top edge reaches the bottom of the screen
+      // Leave briskly, and be gone by the time the panel's top edge reaches
+      // the bottom of the screen.
+      span = Math.min(vh * 0.35, room);
       start = next.top - vh / 2 - vh * 0.08 - span;
     } else if (cur.dark && !next.dark) {
-      // begin once the panel's bottom edge has left the top of the screen
-      start = cur.bottom + vh / 2;
+      // Arrive with the white: start when the panel's bottom edge is three
+      // quarters up the screen, finish as it leaves the top.
+      span = Math.min(vh * 0.75, room);
+      start = cur.bottom - vh * 0.25;
     } else {
-      // between two light sections, mostly once the next one has the middle
+      // Between two light sections, mostly once the next one has the middle.
+      span = Math.min(vh * 0.6, room);
       start = (cur.bottom + next.top) / 2 - span * 0.2;
     }
     if (mid < start) return pose(i);

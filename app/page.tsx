@@ -5,10 +5,13 @@ import { Statement } from "@/components/sections/Statement";
 import { Products } from "@/components/sections/Products";
 import { Company } from "@/components/sections/Company";
 import { Contact } from "@/components/sections/Contact";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { organizationSchema } from "@/lib/structured-data";
 
 export default function Home() {
   return (
     <>
+      <JsonLd data={organizationSchema()} />
       <DropsScene />
       <main className="relative z-10">
         <Hero />

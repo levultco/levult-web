@@ -6,7 +6,7 @@ import { Scrub } from "@/components/ui/Scrub";
  */
 export function Statement() {
   return (
-    <section data-scene="statement" aria-labelledby="statement-title" className="relative h-[220svh]">
+    <section data-scene="statement" aria-labelledby="statement-title" className="relative h-[200svh]">
       <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden">
         <div className="frame relative mx-auto max-w-[1040px]">
           <h2 id="statement-title" className="sr-only">

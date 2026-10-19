@@ -10,6 +10,8 @@ import { WebsiteLink } from "@/components/product/WebsiteLink";
 import { SplitText } from "@/components/ui/SplitText";
 import { Arrow } from "@/components/ui/Arrow";
 import { Pill } from "@/components/ui/Pill";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { productSchema } from "@/lib/structured-data";
 
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
@@ -17,7 +19,17 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/features/[slug]">): Promise<Metadata> {
   const product = getProduct((await params).slug);
-  return product ? { title: product.name, description: product.summary } : {};
+  if (!product) return {};
+  const title = `${product.name}: ${product.lead.replace(/\.$/, "")}`;
+  const description = `${product.summary} ${product.kind} de ${product.category.toLowerCase()} creada por Levult.`;
+  const path = `/features/${product.slug}`;
+  return {
+    title,
+    description,
+    alternates: { canonical: path },
+    openGraph: { type: "website", url: path, title: `${title} — Levult`, description },
+    twitter: { card: "summary_large_image", title: `${title} — Levult`, description },
+  };
 }
 
 export default async function ProductPage({ params }: PageProps<"/features/[slug]">) {
@@ -35,6 +47,7 @@ export default async function ProductPage({ params }: PageProps<"/features/[slug
 
   return (
     <>
+      <JsonLd data={productSchema(product)} />
       <main>
         {/* Opening: the name, what it is, the facts and the way to the real thing. */}
         <section data-reveal-group="load" aria-labelledby="product-title" className="frame pb-16 pt-[clamp(140px,16vw,220px)]">
