@@ -23,6 +23,7 @@ export const fragment = /* glsl */ `
   uniform float uK;
   uniform vec2 uMouse;
   uniform float uIntro;
+  uniform vec3 uPage;     // the page ground, exactly as the browser paints it
 
   const float TAN_HALF_FOV = 0.4142;
   const vec3 RO = vec3(0.0, 0.0, 4.0);
@@ -116,6 +117,10 @@ export const fragment = /* glsl */ `
     col += irid * fres * 0.4;
     col += vec3(spec) * 0.8;
 
-    gl_FragColor = vec4(col * alpha, alpha);
+    // The canvas sits above the page with mix-blend-mode: difference, so it
+    // draws the drop's negative: |page − negative| gives back the drop as
+    // designed over the ground, while dark text underneath turns light.
+    vec3 negative = abs(uPage - col);
+    gl_FragColor = vec4(negative * alpha, alpha);
   }
 `;

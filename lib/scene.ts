@@ -9,7 +9,10 @@ export type Pose = { a: Drop; b: Drop; tint: number; m?: { a: Drop; b: Drop } };
 
 // Push a pose off the screen sideways: whatever sits left leaves left,
 // whatever sits right leaves right. Drops keep their size as they go.
-const offscreen = (d: Drop): Drop => ({ ...d, x: d.x < 0 ? -1.9 : 1.9 });
+// The canvas draws above the page (to invert what it covers), so a drop that
+// is merely hidden behind the black panel would still show. Drops therefore
+// shrink to nothing as they slide out, and stay at size 0 under the panel.
+const offscreen = (d: Drop): Drop => ({ ...d, x: d.x < 0 ? -1.9 : 1.9, r: 0 });
 const exit = (p: Pose): Pose => ({
   a: offscreen(p.a),
   b: offscreen(p.b),
@@ -52,16 +55,15 @@ const footer: Pose = {
 export const poses: Record<string, Pose> = {
   hero,
   statement,
-  // Under the black panel the drops wait off screen: first where the
-  // statement sent them, then (unseen, behind the panel) below and right of
-  // the contact pose, so they rise in through the white that opens up under
-  // the panel's bottom edge.
+  // Under the black panel the drops are gone (size 0): first where the
+  // statement sent them, then below and right of the contact pose, so they
+  // grow back as they rise in through the white under the panel's bottom edge.
   destacados: exit(statement),
   compania: {
-    a: { x: 1.45, y: -1.1, r: contacto.a.r },
-    b: { x: 1.6, y: -1.2, r: contacto.b.r },
+    a: { x: 1.45, y: -1.1, r: 0 },
+    b: { x: 1.6, y: -1.2, r: 0 },
     tint: 0,
-    m: { a: { x: 1.45, y: -1.1, r: contacto.m!.a.r }, b: { x: 1.6, y: -1.2, r: contacto.m!.b.r } },
+    m: { a: { x: 1.45, y: -1.1, r: 0 }, b: { x: 1.6, y: -1.2, r: 0 } },
   },
   contacto,
   footer,

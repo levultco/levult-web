@@ -5,8 +5,8 @@ import { Wordmark } from "@/components/brand/Logo";
 
 /**
  * The page's close, on the light ground where the fluid comes to rest.
- * Positioned without a z-index so the logo can blend with the canvas behind
- * it: its letters turn white wherever a drop passes underneath.
+ * The fluid comes to rest over the end of the giant logo; the drops' canvas
+ * inverts what it covers, so those letters turn white.
  */
 export function Footer() {
   return (
@@ -40,7 +40,9 @@ export function Footer() {
           Levult crea, lanza y hace crecer productos digitales propios.
         </p>
       </div>
-      <div className="frame mt-24 text-white mix-blend-difference">
+      {/* The drops' canvas sits above the page and inverts what it covers,
+          so the logo turns white wherever a drop passes over it. */}
+      <div className="frame mt-24 text-ink">
         <Wordmark title="" className="block h-auto w-full" />
       </div>
       <div className="frame flex flex-wrap justify-between gap-3 pb-8 pt-8 text-[15px] text-ink-soft">

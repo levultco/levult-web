@@ -17,7 +17,19 @@ const COLORS = {
 
 const HALF_H = 4 * 0.4142; // visible half-height at z = 0
 
-/** One fixed canvas behind the whole page; sections steer it by scroll. */
+/** The page ground from CSS, as 0–1 sRGB channels. */
+function pageGround(): [number, number, number] {
+  const hex = getComputedStyle(document.documentElement).getPropertyValue("--ground").trim() || "#f0f1fa";
+  const n = parseInt(hex.replace("#", "").padEnd(6, "0").slice(0, 6), 16);
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+}
+
+/**
+ * One fixed canvas over the whole page; sections steer it by scroll. It sits
+ * above the content and blends with "difference", so whatever text or button
+ * a drop passes over turns inside out (dark ink becomes light) on every
+ * browser, including iOS, where content can't blend with a canvas below it.
+ */
 export function DropsScene() {
   const host = useRef<HTMLDivElement>(null);
 
@@ -52,6 +64,8 @@ export function DropsScene() {
       uK: { value: 0.55 },
       uMouse: { value: new THREE.Vector2() },
       uIntro: { value: reduce ? 1 : 0 },
+      // Raw sRGB (no colour management): it must match the CSS ground exactly.
+      uPage: { value: new THREE.Vector3(...pageGround()) },
     };
 
     const scene = new THREE.Scene();
@@ -167,5 +181,5 @@ export function DropsScene() {
     };
   }, []);
 
-  return <div ref={host} aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 [&>canvas]:h-full [&>canvas]:w-full" />;
+  return <div ref={host} aria-hidden="true" className="pointer-events-none fixed inset-0 z-30 mix-blend-difference [&>canvas]:h-full [&>canvas]:w-full" />;
 }
