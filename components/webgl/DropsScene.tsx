@@ -119,6 +119,7 @@ export function DropsScene() {
     let first = true;
     // The side of the dark panel the drops were last placed on.
     let placed = 0;
+    let drawn = true;
     let raf = 0;
     let visible = true;
     const clock = new THREE.Clock();
@@ -177,7 +178,16 @@ export function DropsScene() {
       }
       uniforms.uK.value = 0.55 * (0.4 + 0.6 * uniforms.uIntro.value);
 
-      renderer.render(scene, camera);
+      // With no drop on screen the canvas leaves the page entirely: a
+      // full-screen blended layer makes the browser composite everything under
+      // it, and iOS Safari, short of memory over the glowing cards, can stop
+      // painting parts of the page while it scrolls.
+      const shown = (cur.ar > 0.005 || cur.br > 0.005) && uniforms.uIntro.value > 0;
+      if (shown !== drawn) {
+        drawn = shown;
+        el.style.display = shown ? "" : "none";
+      }
+      if (shown) renderer.render(scene, camera);
     };
     frame();
 
