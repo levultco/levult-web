@@ -41,7 +41,7 @@ const contacto: Pose = {
   a: { x: 0.6, y: 0.06, r: 0.46 },
   b: { x: 0.74, y: -0.14, r: 0.36 },
   tint: 0,
-  m: { a: { x: 0.2, y: -0.8, r: 0.34 }, b: { x: 0.42, y: -0.92, r: 0.24 } },
+  m: { a: { x: 0.42, y: -0.52, r: 0.28 }, b: { x: 0.64, y: -0.66, r: 0.2 } },
 };
 // At the very end the drops fuse again and settle on the end of the giant
 // wordmark, over the "lt", so the name still reads whole.
@@ -124,4 +124,40 @@ export function poseAt(scrollY: number, vh: number, sections: SceneSection[], na
     }
   }
   return pose(sections.length - 1);
+}
+
+export type Chased = { ax: number; ay: number; ar: number; bx: number; by: number; br: number; tint: number };
+
+/**
+ * Ease one drop toward its target. Normally it glides there, even on a fast
+ * scroll. Only when the scroll has crossed the black panel (`jump`) would
+ * gliding drag the drop over the page from one end to the other; then it
+ * shrinks away where it is, reappears at the target and grows back.
+ */
+export function chase(cur: Chased, key: "a" | "b", to: { x: number; y: number; r: number }, k: number, kShrink: number, jump: boolean) {
+  const x = `${key}x` as const;
+  const y = `${key}y` as const;
+  const r = `${key}r` as const;
+  const far = jump && Math.hypot(to.x - cur[x], to.y - cur[y]) > 0.6;
+  if (far && cur[r] > 0.01) {
+    cur[r] += (0 - cur[r]) * kShrink;
+    return;
+  }
+  if (far) {
+    cur[x] = to.x;
+    cur[y] = to.y;
+  } else {
+    cur[x] += (to.x - cur[x]) * k;
+    cur[y] += (to.y - cur[y]) * k;
+  }
+  cur[r] += (to.r - cur[r]) * k;
+}
+
+/** Which side of the dark panel the middle of the screen is on: 0 above, 1 on it, 2 below. */
+export function panelSide(scrollY: number, vh: number, sections: SceneSection[]): number {
+  const dark = sections.filter((s) => s.dark);
+  if (!dark.length) return 0;
+  const mid = scrollY + vh / 2;
+  if (mid < dark[0].top) return 0;
+  return mid > dark[dark.length - 1].bottom ? 2 : 1;
 }

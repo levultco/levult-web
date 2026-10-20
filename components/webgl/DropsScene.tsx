@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { poseAt, type SceneSection } from "@/lib/scene";
+import { chase, panelSide, poseAt, type SceneSection } from "@/lib/scene";
 import { fragment, vertex } from "./shaders";
 import { onReveal } from "@/lib/reveal-gate";
 
@@ -66,6 +66,8 @@ export function DropsScene() {
       uIntro: { value: reduce ? 1 : 0 },
       // Raw sRGB (no colour management): it must match the CSS ground exactly.
       uPage: { value: new THREE.Vector3(...pageGround()) },
+      uMask: { value: new THREE.Vector4(-1e4, -1e4, -1e4, -1e4) },
+      uMaskR: { value: 0 },
     };
 
     const scene = new THREE.Scene();
@@ -76,7 +78,11 @@ export function DropsScene() {
     scene.add(quad);
 
     let sections: SceneSection[] = [];
+    let panel: HTMLElement | null = null;
+    let panelRadius = 0;
     const measure = () => {
+      panel = document.querySelector<HTMLElement>("[data-drops-mask]");
+      panelRadius = panel ? parseFloat(getComputedStyle(panel).borderTopLeftRadius) || 0 : 0;
       sections = Array.from(document.querySelectorAll<HTMLElement>("[data-scene]")).map((s) => {
         const r = s.getBoundingClientRect();
         return {
@@ -111,6 +117,8 @@ export function DropsScene() {
     // Current (eased) pose, chased toward the scroll target every frame.
     const cur = { ax: 0, ay: 0, ar: 0, bx: 0, by: 0, br: 0, tint: 0 };
     let first = true;
+    // The side of the dark panel the drops were last placed on.
+    let placed = 0;
     let raf = 0;
     let visible = true;
     const clock = new THREE.Clock();
@@ -131,13 +139,20 @@ export function DropsScene() {
 
       const target = poseAt(window.scrollY, window.innerHeight, sections, narrowQuery.matches);
       const k = first || reduce ? 1 : 1 - Math.exp(-dt * 7);
+      const kShrink = 1 - Math.exp(-dt * 16);
       first = false;
-      cur.ax += (target.a.x - cur.ax) * k;
-      cur.ay += (target.a.y - cur.ay) * k;
-      cur.ar += (target.a.r - cur.ar) * k;
-      cur.bx += (target.b.x - cur.bx) * k;
-      cur.by += (target.b.y - cur.by) * k;
-      cur.br += (target.b.r - cur.br) * k;
+      const side = panelSide(window.scrollY, window.innerHeight, sections);
+      const jump = side !== placed;
+      chase(cur, "a", target.a, k, kShrink, jump);
+      chase(cur, "b", target.b, k, kShrink, jump);
+      // Once both drops have gone, they reappear on the new side.
+      if (jump && cur.ar <= 0.01 && cur.br <= 0.01) {
+        cur.ax = target.a.x;
+        cur.ay = target.a.y;
+        cur.bx = target.b.x;
+        cur.by = target.b.y;
+        placed = side;
+      }
       cur.tint += (target.tint - cur.tint) * k;
 
       const m = uniforms.uMouse.value;
@@ -146,6 +161,14 @@ export function DropsScene() {
       uniforms.uA.value.set(cur.ax * halfW + m.x * 0.04, cur.ay * HALF_H + m.y * 0.04, 0, cur.ar * unit);
       uniforms.uB.value.set(cur.bx * halfW + m.x * 0.03, cur.by * HALF_H + m.y * 0.03, 0.15, cur.br * unit);
       uniforms.uTint.value = cur.tint;
+      // The dark panel masks the drops, so they pass behind it, never over it.
+      if (panel) {
+        const r = panel.getBoundingClientRect();
+        const ratio = renderer.getPixelRatio();
+        const h = window.innerHeight;
+        uniforms.uMask.value.set(r.left * ratio, (h - r.bottom) * ratio, r.right * ratio, (h - r.top) * ratio);
+        uniforms.uMaskR.value = panelRadius * ratio;
+      }
       uniforms.uTime.value = time;
       // The drops grow out of nothing on load and fuse as they grow.
       if (!reduce && uniforms.uIntro.value < 1) {

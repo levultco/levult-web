@@ -17,7 +17,7 @@ export default function Home() {
         <Hero />
         <Statement />
         {/* One black panel, inset with rounded corners, holds the work and the company. */}
-        <div className="theme-dark relative z-10 rounded-[clamp(24px,3vw,44px)]">
+        <div data-drops-mask className="theme-dark relative z-10 rounded-[clamp(24px,3vw,44px)]">
           <Products />
           <Company />
         </div>

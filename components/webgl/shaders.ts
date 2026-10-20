@@ -24,6 +24,8 @@ export const fragment = /* glsl */ `
   uniform vec2 uMouse;
   uniform float uIntro;
   uniform vec3 uPage;     // the page ground, exactly as the browser paints it
+  uniform vec4 uMask;     // the dark panel on screen (GL pixels: x0, y0, x1, y1)…
+  uniform float uMaskR;   // …and its corner radius in pixels
 
   const float TAN_HALF_FOV = 0.4142;
   const vec3 RO = vec3(0.0, 0.0, 4.0);
@@ -63,7 +65,19 @@ export const fragment = /* glsl */ `
     );
   }
 
+  // Signed distance to the dark panel: negative inside it.
+  float panel(vec2 p) {
+    vec2 c = (uMask.xy + uMask.zw) * 0.5;
+    vec2 b = (uMask.zw - uMask.xy) * 0.5;
+    vec2 q = abs(p - c) - b + uMaskR;
+    return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - uMaskR;
+  }
+
   void main() {
+    // Drops never show over the dark panel: they pass behind it.
+    float outside = clamp(panel(gl_FragCoord.xy) + 0.5, 0.0, 1.0);
+    if (outside <= 0.0) { gl_FragColor = vec4(0.0); return; }
+
     vec2 uv = (gl_FragCoord.xy * 2.0 - uRes) / uRes.y;
     vec3 rd = normalize(vec3(uv * TAN_HALF_FOV, -1.0));
 
@@ -82,7 +96,7 @@ export const fragment = /* glsl */ `
 
     // Soft edge from the closest approach, one pixel wide.
     float px = 2.0 * TAN_HALF_FOV * 4.0 / uRes.y;
-    float alpha = hit ? 1.0 : 1.0 - smoothstep(0.0, px * 1.5, dmin);
+    float alpha = (hit ? 1.0 : 1.0 - smoothstep(0.0, px * 1.5, dmin)) * outside;
     if (alpha <= 0.0) { gl_FragColor = vec4(0.0); return; }
 
     vec3 p = RO + rd * t;
