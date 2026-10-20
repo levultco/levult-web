@@ -187,12 +187,14 @@ export function InkTransition() {
    * slideshow: the browser snapshots old and new, the new one grows out of the
    * click inside a bubble that refracts it (radial pull, ripples, a split per
    * colour channel) while the old page stays untouched outside. Returns
-   * false where view transitions are missing, so the ink takes over.
+   * false on phones or where view transitions are missing, so the ink takes over.
    */
   const liquidTransition = (url: URL, x: number, y: number) => {
     const start = document.startViewTransition?.bind(document);
     const filter = warp.current;
     if (!start || !filter) return false;
+    // Phones keep the plain ink: the refraction is for larger screens.
+    if (window.matchMedia("(max-width: 767px)").matches) return false;
     const root = document.documentElement;
     const maps = filter.querySelectorAll("feDisplacementMap");
     const set = (scale: number) => {
