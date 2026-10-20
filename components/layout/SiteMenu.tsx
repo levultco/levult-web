@@ -47,8 +47,11 @@ export function SiteMenu({ open, anchor, onNavigate }: Props) {
     const x = box ? box.left + box.width / 2 : window.innerWidth - 60;
     const y = box ? box.top + box.height / 2 : 50;
     const ink = { r: open ? 0 : inkReach(x, y), max: inkReach(x, y) };
+    // inkPath is empty at r ≈ 0, and an invalid clip-path is ignored: the whole
+    // menu would show for a frame. A 1px dot keeps the clip valid.
     const paint = () => {
-      el.style.clipPath = `path("${inkPath(x, y, ink.r, performance.now() / 1000, inkCalm(ink.r, ink.max))}")`;
+      const r = Math.max(ink.r, 1);
+      el.style.clipPath = `path("${inkPath(x, y, r, performance.now() / 1000, inkCalm(r, ink.max))}")`;
     };
 
     // A page change is already covered by the transition ink: just vanish.
