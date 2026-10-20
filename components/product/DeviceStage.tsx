@@ -22,10 +22,10 @@ export function DeviceStage({ product, children, className = "" }: Props) {
       <div aria-hidden="true" className="absolute inset-0 -z-10 transition-transform duration-[1200ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover/stage:scale-110">
         {/* Radial light rather than a blur filter: the same glow, but nothing to
             recompute while scrolling, which mobile browsers struggle with. */}
-        <span className="absolute left-[18%] top-[22%] h-[52%] w-[46%] scale-[1.9] opacity-70" style={{ background: light(first) }} />
-        <span className="absolute right-[16%] top-[38%] h-[48%] w-[42%] scale-[2] opacity-60" style={{ background: light(second) }} />
+        <span className="absolute left-[18%] top-[22%] h-[52%] w-[46%] scale-[1.9] opacity-90 md:opacity-70" style={{ background: light(first) }} />
+        <span className="absolute right-[16%] top-[38%] h-[48%] w-[42%] scale-[2] opacity-80 md:opacity-60" style={{ background: light(second) }} />
         {third && (
-          <span className="absolute bottom-[-10%] left-[34%] h-[40%] w-[34%] scale-[2] opacity-50" style={{ background: light(third) }} />
+          <span className="absolute bottom-[-10%] left-[34%] h-[40%] w-[34%] scale-[2] opacity-70 md:opacity-50" style={{ background: light(third) }} />
         )}
       </div>
       {children}

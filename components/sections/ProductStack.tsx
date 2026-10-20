@@ -72,8 +72,8 @@ export function ProductStack() {
               </div>
             </div>
             <Link href={`/features/${p.slug}`} tabIndex={-1} aria-hidden="true" className="group block md:col-span-7">
-              <DeviceStage product={p} className="flex h-[min(66svh,520px)] rounded-[24px] items-end justify-center md:h-full">
-                <div className="w-[min(320px,80%)] translate-y-[16%] transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:translate-y-[11%] md:w-[min(340px,56%)]">
+              <DeviceStage product={p} className="flex rounded-[24px] pt-10 items-end justify-center ring-1 ring-inset ring-white/10 md:h-full md:pt-0">
+                <div className="w-[min(300px,84%)] translate-y-[12%] [mask-image:linear-gradient(to_bottom,#000_70%,transparent_96%)] md:[mask-image:none] transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:translate-y-[11%] md:w-[min(340px,56%)]">
                   <div className="pointer-events-none" inert>
                     <ProductDevice product={p} />
                   </div>
