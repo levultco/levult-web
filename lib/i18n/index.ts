@@ -23,14 +23,23 @@ export function localePath(lang: Lang, path = "/"): string {
   return `/${lang}${path}`;
 }
 
-/** Which language a pathname is in, and what it is without the prefix. */
+/**
+ * Which language a pathname is in, and what it is without the prefix. Spanish
+ * has no prefix in the browser, but the pages are built under /es, and a
+ * prerendered page sees that internal path: read it as the same thing.
+ */
 export function parsePath(pathname: string): { lang: Lang; path: string } {
   for (const lang of locales) {
-    if (lang === defaultLang) continue;
     if (pathname === `/${lang}`) return { lang, path: "/" };
     if (pathname.startsWith(`/${lang}/`)) return { lang, path: pathname.slice(lang.length + 1) };
   }
   return { lang: defaultLang, path: pathname };
+}
+
+/** The address as the visitor sees it: "/es/features/x" (the internal one) → "/features/x". */
+export function publicPath(pathname: string): string {
+  const { lang, path } = parsePath(pathname);
+  return localePath(lang, path);
 }
 
 /**

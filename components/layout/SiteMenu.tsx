@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 import { contactEmail } from "@/lib/content";
-import { localePath, locales, switchPath, type Lang } from "@/lib/i18n";
+import { localePath, locales, publicPath, switchPath, type Lang } from "@/lib/i18n";
 import type { Dict } from "@/lib/i18n/dictionaries/es";
 import type { Product } from "@/lib/products";
 import { inkCalm, inkPath, inkReach } from "@/lib/ink";
@@ -34,7 +34,7 @@ type Props = {
 export function SiteMenu({ lang, t, products, open, anchor, onNavigate }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const first = useRef(true);
-  const pathname = usePathname();
+  const pathname = publicPath(usePathname());
 
   useEffect(() => {
     const el = root.current;

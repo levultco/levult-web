@@ -7,7 +7,7 @@ import { Roll } from "@/components/ui/Roll";
 import { MorphLabel, MorphIcon } from "@/components/ui/MorphLabel";
 import { SiteMenu, type MenuText } from "./SiteMenu";
 import { Wordmark } from "@/components/brand/Logo";
-import { localePath, locales, switchPath, type Lang } from "@/lib/i18n";
+import { localePath, locales, publicPath, switchPath, type Lang } from "@/lib/i18n";
 import type { Product } from "@/lib/products";
 
 type Props = {
@@ -21,7 +21,8 @@ export function Header({ lang, t, products }: Props) {
   const [open, setOpen] = useState(false);
   const last = useRef(0);
   const menuButton = useRef<HTMLButtonElement>(null);
-  const pathname = usePathname();
+  // A prerendered Spanish page sees /es; the visitor sees /. Compare what the visitor sees.
+  const pathname = publicPath(usePathname());
   const home = localePath(lang, "/");
   const otherLang = locales.find((l) => l !== lang)!;
 
