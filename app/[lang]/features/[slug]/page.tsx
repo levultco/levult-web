@@ -16,6 +16,10 @@ import { Pill } from "@/components/ui/Pill";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { productSchema } from "@/lib/structured-data";
 
+// This page reads `params` before it renders so an unknown work answers with a real 404 (behind Suspense
+// the status would already be 200). Every known work is prerendered, so the block costs nothing in practice.
+export const instant = false;
+
 export function generateStaticParams() {
   return locales.flatMap((lang) => productFacts.map((p) => ({ lang, slug: p.slug })));
 }
