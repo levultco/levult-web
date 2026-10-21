@@ -59,7 +59,10 @@ const catalog: (ProductBase & { text: Record<Lang, ProductText> })[] = [
         body: "ParyUp conecta lo que pasa en la ciudad con quienes quieren vivirlo ahora. Descubres planes, ves quién va y entras sin fricción. Y para los clubs, Nexus reúne eventos, acceso, equipo, estadísticas y álbumes en un solo lugar.",
         features: [
           { title: "Qué hay hoy", text: "Todo lo que pasa cerca de ti en un solo sitio, para decidir en segundos." },
-          { title: "Sabes quién va", text: "Grupos, mensajes directos y chats de discoteca para organizarte sin salir de la app." },
+          { title: "Mapa en tiempo real", text: "Los eventos de tu ciudad en un mapa que se actualiza al momento, para ver qué hay cerca y decidir sobre la marcha." },
+          { title: "Sabes quién va", text: "Ves quién va a cada plan y armas tu grupo sin salir de la app." },
+          { title: "Matches", text: "Conecta con gente que va a los mismos planes que tú." },
+          { title: "Chats", text: "Mensajes directos y de grupo para quedar y organizarte antes de salir." },
           { title: "Entrada con QR", text: "Compras tu entrada y accedes con QR, sin saltar entre plataformas." },
           { title: "Eventos privados", text: "Creas tu evento, invitas a quien quieras y controlas quién entra." },
           { title: "Recap de la noche", text: "Cada salida deja un resumen con fotos, gente y momentos para volver a ella." },
@@ -77,7 +80,10 @@ const catalog: (ProductBase & { text: Record<Lang, ProductText> })[] = [
         body: "ParyUp connects what's happening in the city with the people who want to live it right now. You discover plans, see who's going and walk in without friction. And for clubs, Nexus brings events, access, staff, stats and albums together in one place.",
         features: [
           { title: "What's on today", text: "Everything happening near you in one place, so you can decide in seconds." },
-          { title: "See who's going", text: "Groups, direct messages and club chats to get organised without leaving the app." },
+          { title: "Live event map", text: "Your city's events on a map that updates in real time, so you can see what's nearby and decide on the spot." },
+          { title: "See who's going", text: "See who's going to each plan and build your group without leaving the app." },
+          { title: "Matches", text: "Connect with people who are going to the same plans as you." },
+          { title: "Chats", text: "Direct and group messages to meet up and get organised before you go out." },
           { title: "QR tickets", text: "Buy your ticket and get in with a QR code, no jumping between platforms." },
           { title: "Private events", text: "Create your event, invite whoever you want and control who gets in." },
           { title: "Night recap", text: "Every night out leaves a summary with photos, people and moments to relive it." },
