@@ -1,12 +1,9 @@
 import { SplitText } from "@/components/ui/SplitText";
+import { getI18n } from "@/lib/i18n/server";
 
-const principles = [
-  { title: "Producto propio", text: "Todo lo que lanzamos es nuestro, y lo mantenemos vivo." },
-  { title: "Lo usamos nosotros", text: "Si no lo abriríamos cada día, no sale a la calle." },
-  { title: "Medimos en personas", text: "Gente que vuelve, planes que se cumplen, plazas que se aprueban. Lo demás es ruido." },
-];
-
-export function Company() {
+export async function Company() {
+  const { t } = await getI18n();
+  const principles = t.company.principles;
   return (
     <section
       id="compania"
@@ -17,12 +14,11 @@ export function Company() {
       <div data-reveal-group className="frame grid grid-cols-1 gap-y-10 md:grid-cols-12 md:gap-x-6">
         <SplitText
           id="compania-title"
-          text="Construimos para quedarnos."
+          text={t.company.title}
           className="display max-w-[13ch] text-[clamp(44px,6vw,104px)] md:col-span-8"
         />
         <p data-reveal className="max-w-[40ch] text-[18px] leading-[1.6] text-ink-soft-dark md:col-span-4 md:self-end">
-          Levult diseña, desarrolla y opera sus propios productos digitales. Lanzamos menos, pero cuidamos cada
-          uno durante años.
+          {t.company.text}
         </p>
       </div>
 

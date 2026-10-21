@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { products, getProduct, domainOf } from "@/lib/products";
+import { productFacts, getProduct, getProducts, domainOf } from "@/lib/products";
+import { fmt, hasLang, locales, localePath, ogLocale } from "@/lib/i18n";
+import { getDictionary, getI18n } from "@/lib/i18n/server";
+import { alternatesFor } from "@/lib/i18n/metadata";
 import { Choreography } from "@/components/providers/Choreography";
 import { ProductDevice } from "@/components/product/ProductDevice";
 import { DeviceStage } from "@/components/product/DeviceStage";
@@ -14,46 +17,51 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { productSchema } from "@/lib/structured-data";
 
 export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
+  return locales.flatMap((lang) => productFacts.map((p) => ({ lang, slug: p.slug })));
 }
 
-export async function generateMetadata({ params }: PageProps<"/features/[slug]">): Promise<Metadata> {
-  const product = getProduct((await params).slug);
+export async function generateMetadata({ params }: PageProps<"/[lang]/features/[slug]">): Promise<Metadata> {
+  const { lang, slug } = await params;
+  if (!hasLang(lang)) return {};
+  const product = getProduct(slug, lang);
   if (!product) return {};
+  const t = getDictionary(lang).product;
   const title = `${product.name}: ${product.lead.replace(/\.$/, "")}`;
-  const description = `${product.summary} ${product.kind} de ${product.category.toLowerCase()} creada por Levult.`;
-  const path = `/features/${product.slug}`;
+  const description = fmt(t.description, { summary: product.summary, kind: product.kind, category: product.category.toLowerCase() });
+  const path = localePath(lang, `/features/${product.slug}`);
   return {
     title,
     description,
-    alternates: { canonical: path },
-    openGraph: { type: "website", url: path, title: `${title} — Levult`, description },
+    alternates: alternatesFor(lang, `/features/${product.slug}`),
+    openGraph: { type: "website", locale: ogLocale[lang], url: path, title: `${title} — Levult`, description },
     twitter: { card: "summary_large_image", title: `${title} — Levult`, description },
   };
 }
 
-export default async function ProductPage({ params }: PageProps<"/features/[slug]">) {
+export default async function ProductPage({ params }: PageProps<"/[lang]/features/[slug]">) {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const { lang, t } = await getI18n();
+  const product = getProduct(slug, lang);
   if (!product) notFound();
 
-  const next = products[(products.indexOf(product) + 1) % products.length];
+  const all = getProducts(lang);
+  const next = all[(all.findIndex((p) => p.slug === product.slug) + 1) % all.length];
   const facts = [
-    { term: "Tipo", detail: product.kind },
-    { term: "Categoría", detail: product.category },
-    { term: "Plataformas", detail: product.platforms },
-    { term: "Estado", detail: product.status },
+    { term: t.product.facts.kind, detail: product.kind },
+    { term: t.product.facts.category, detail: product.category },
+    { term: t.product.facts.platforms, detail: product.platforms },
+    { term: t.product.facts.status, detail: product.status },
   ];
 
   return (
     <>
-      <JsonLd data={productSchema(product)} />
+      <JsonLd data={productSchema(product, lang)} />
       <main>
         {/* Opening: the name, what it is, the facts and the way to the real thing. */}
         <section data-reveal-group="load" aria-labelledby="product-title" className="frame pb-16 pt-[clamp(140px,16vw,220px)]">
-          <Link href="/#destacados" className="inline-flex items-center gap-2 text-[15px] uppercase">
+          <Link href={localePath(lang, "/#destacados")} className="inline-flex items-center gap-2 text-[15px] uppercase">
             <Arrow className="rotate-180" />
-            Trabajos destacados
+            {t.product.back}
           </Link>
           <SplitText as="h1" id="product-title" text={product.name} className="display mt-8 text-[clamp(72px,15vw,260px)] leading-[0.82]" />
           <div className="mt-12 grid gap-10 md:grid-cols-12 md:gap-6">
@@ -63,7 +71,7 @@ export default async function ProductPage({ params }: PageProps<"/features/[slug
               </p>
               <div data-reveal className="mt-10 flex flex-wrap gap-2.5">
                 <Pill href={product.url} icon="external">
-                  {`Visitar ${domainOf(product.url)}`}
+                  {fmt(t.product.visit, { domain: domainOf(product.url) })}
                 </Pill>
               </div>
             </div>
@@ -79,7 +87,7 @@ export default async function ProductPage({ params }: PageProps<"/features/[slug
         </section>
 
         {/* The live interface, lit by the brand. */}
-        <section aria-label={`${product.name} en funcionamiento`} className="frame">
+        <section aria-label={fmt(t.product.running, { name: product.name })} className="frame">
           <div data-reveal-group>
             <div data-reveal>
               <DeviceStage product={product} className="grid min-h-[min(92svh,900px)] place-items-center rounded-[28px] py-16">
@@ -100,7 +108,7 @@ export default async function ProductPage({ params }: PageProps<"/features/[slug
         <section aria-labelledby="product-features" className="theme-dark relative z-10 mt-[var(--gap-section)] rounded-[clamp(24px,3vw,44px)] py-[var(--gap-section)]">
           <div data-reveal-group className="frame grid gap-10 md:grid-cols-12 md:gap-6">
             <h2 id="product-features" className="display text-[clamp(44px,5.4vw,92px)] md:col-span-5">
-              Qué hace
+              {t.product.whatItDoes}
             </h2>
             <p data-reveal className="max-w-[46ch] text-[20px] leading-[1.55] text-ink-soft-dark md:col-span-6 md:col-start-7 md:self-end">
               {product.body}
@@ -132,8 +140,8 @@ export default async function ProductPage({ params }: PageProps<"/features/[slug
           )}
         </section>
 
-        <WebsiteLink product={product} />
-        {next.slug !== product.slug && <NextWork product={next} />}
+        <WebsiteLink product={product} t={t.product} />
+        {next.slug !== product.slug && <NextWork product={next} lang={lang} t={t.product} />}
       </main>
       <Choreography />
     </>

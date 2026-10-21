@@ -1,20 +1,22 @@
 import { ImageResponse } from "next/og";
-import { getProduct, products } from "@/lib/products";
+import { getProduct, getProducts, productFacts } from "@/lib/products";
+import { hasLang, defaultLang, locales } from "@/lib/i18n";
 import { OgWordmark, ogFonts, ogSize } from "@/lib/og";
 import { site } from "@/lib/site";
 
-export const alt = "Un trabajo destacado de Levult";
+export const alt = "Levult";
 export const size = ogSize;
 export const contentType = "image/png";
 
 export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
+  return locales.flatMap((lang) => productFacts.map((p) => ({ lang, slug: p.slug })));
 }
 
 /** Each work's link preview: its name on a dark stage lit by the brand's colours. */
-export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const product = getProduct(slug) ?? products[0];
+export default async function Image({ params }: { params: Promise<{ lang: string; slug: string }> }) {
+  const { lang: raw, slug } = await params;
+  const lang = hasLang(raw) ? raw : defaultLang;
+  const product = getProduct(slug, lang) ?? getProducts(lang)[0];
   const [first, second, third] = product.glow;
   const glow = (color: string, x: number, y: number, w: number, h: number, alpha = "cc") => (
     <div

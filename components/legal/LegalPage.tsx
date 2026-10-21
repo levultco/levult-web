@@ -1,7 +1,7 @@
 import { Children, isValidElement, type ReactNode } from "react";
 import { Choreography } from "@/components/providers/Choreography";
 import { SplitText } from "@/components/ui/SplitText";
-import { legal } from "@/lib/legal";
+import { getI18n } from "@/lib/i18n/server";
 
 type Props = {
   title: string;
@@ -19,7 +19,8 @@ const slug = (text: string) =>
     .replace(/^-|-$/g, "");
 
 /** The frame shared by the legal pages: a title, an index and plain, readable text. */
-export function LegalPage({ title, lead, children }: Props) {
+export async function LegalPage({ title, lead, children }: Props) {
+  const { t } = await getI18n();
   // The index lists every section, read from the sections themselves.
   const titles = Children.toArray(children).flatMap((child) =>
     isValidElement<{ title?: string }>(child) && child.props.title ? [child.props.title] : [],
@@ -33,11 +34,11 @@ export function LegalPage({ title, lead, children }: Props) {
             {lead}
           </p>
           <p data-reveal className="mt-4 text-[15px] uppercase text-ink-soft">
-            Última actualización: {legal.updated}
+            {t.legalPage.updated}: {t.legalPage.updatedDate}
           </p>
         </section>
         <div className="frame grid gap-10 pb-[var(--gap-section)] pt-6 md:grid-cols-12 md:gap-6">
-          <nav aria-label="En esta página" className="hidden md:col-span-3 md:block">
+          <nav aria-label={t.legalPage.index} className="hidden md:col-span-3 md:block">
             <ul className="sticky top-28 grid gap-2 text-[15px]">
               {titles.map((t) => (
                 <li key={t}>

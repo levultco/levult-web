@@ -4,15 +4,22 @@ import { useEffect, useRef, type RefObject } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
-import { nav, contactEmail } from "@/lib/content";
-import { products } from "@/lib/products";
+import { contactEmail } from "@/lib/content";
+import { localePath, locales, switchPath, type Lang } from "@/lib/i18n";
+import type { Dict } from "@/lib/i18n/dictionaries/es";
+import type { Product } from "@/lib/products";
 import { inkCalm, inkPath, inkReach } from "@/lib/ink";
 import { DeviceStage } from "@/components/product/DeviceStage";
 import { Arrow } from "@/components/ui/Arrow";
 import { Roll } from "@/components/ui/Roll";
 import { LogoSymbol } from "@/components/brand/Logo";
 
+export type MenuText = Pick<Dict, "header" | "menu" | "nav" | "footer">;
+
 type Props = {
+  lang: Lang;
+  t: MenuText;
+  products: Product[];
   open: boolean;
   /** The button that opens the menu: the ink grows out of it and returns to it. */
   anchor: RefObject<HTMLElement | null>;
@@ -24,7 +31,7 @@ type Props = {
  * screen, the links rise out of masks one after another, the works follow;
  * closing, everything drops away and the ink runs back into the button.
  */
-export function SiteMenu({ open, anchor, onNavigate }: Props) {
+export function SiteMenu({ lang, t, products, open, anchor, onNavigate }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const first = useRef(true);
   const pathname = usePathname();
@@ -91,7 +98,7 @@ export function SiteMenu({ open, anchor, onNavigate }: Props) {
       id="site-menu"
       role="dialog"
       aria-modal="true"
-      aria-label="Menú"
+      aria-label={t.menu.aria}
       aria-hidden={!open}
       // Lets the menu scroll on its own while the page behind is locked.
       data-lenis-prevent
@@ -99,18 +106,18 @@ export function SiteMenu({ open, anchor, onNavigate }: Props) {
       style={{ visibility: "hidden" }}
     >
       <div className="frame grid gap-14 md:grid-cols-12 md:gap-6">
-        <nav aria-label="Menú principal" className="md:col-span-7">
+        <nav aria-label={t.menu.mainAria} className="md:col-span-7">
           <ul className="group/menu">
-            {nav.map((item) => (
+            {t.nav.map((item) => (
               <li key={item.href} className="overflow-hidden">
                 <Link
-                  href={item.href}
+                  href={localePath(lang, item.href)}
                   onClick={(e) => onNavigate(e, item.href)}
                   tabIndex={open ? 0 : -1}
                   className="group/link flex items-center gap-5 py-1 text-[clamp(52px,7.4vw,112px)] font-medium leading-[1] tracking-[-0.05em] transition-opacity duration-300 group-hover/menu:opacity-30 hover:!opacity-100 focus-visible:!opacity-100"
                 >
                   <span data-menu-line className="flex origin-bottom-left items-center gap-5">
-                    {isActive(item.href) && <span aria-hidden="true" className="h-3 w-3 rounded-full bg-ground md:h-4 md:w-4" />}
+                    {isActive(localePath(lang, item.href)) && <span aria-hidden="true" className="h-3 w-3 rounded-full bg-ground md:h-4 md:w-4" />}
                     {item.label}
                     <span
                       aria-hidden="true"
@@ -127,12 +134,12 @@ export function SiteMenu({ open, anchor, onNavigate }: Props) {
 
         <div className="md:col-span-5 md:col-start-8 md:pt-3">
           <p data-menu-fade className="text-[15px] uppercase text-ink-soft-dark">
-            Trabajos destacados
+            {t.menu.featured}
           </p>
           <ul className="mt-5 grid gap-3">
             {products.map((p) => (
               <li key={p.slug} data-menu-fade>
-                <Link href={`/features/${p.slug}`} tabIndex={open ? 0 : -1} className="group block">
+                <Link href={localePath(lang, `/features/${p.slug}`)} tabIndex={open ? 0 : -1} className="group block">
                   <DeviceStage product={p} className="flex h-[clamp(112px,17vh,190px)] items-end justify-between rounded-[18px] p-5 md:p-6">
                     <span className="text-[clamp(26px,2.4vw,40px)] font-medium leading-none tracking-[-0.04em]">{p.name}</span>
                     <span className="flex items-center gap-3 text-[14px] uppercase text-ink-soft-dark">
@@ -154,8 +161,19 @@ export function SiteMenu({ open, anchor, onNavigate }: Props) {
           <Roll>{contactEmail}</Roll>
         </a>
         <div data-menu-fade className="flex items-center gap-6">
-          <a href="/#contacto" onClick={(e) => onNavigate(e, "/#contacto")} tabIndex={open ? 0 : -1} className="pill pill--dark">
-            <Roll>Hablemos</Roll>
+          <a
+            href={switchPath(pathname, locales.find((l) => l !== lang)!)}
+            data-reload
+            lang={locales.find((l) => l !== lang)!}
+            hrefLang={locales.find((l) => l !== lang)!}
+            aria-label={t.header.switchAria}
+            tabIndex={open ? 0 : -1}
+            className="pill pill--dark"
+          >
+            {t.header.switchShort}
+          </a>
+          <a href={localePath(lang, "/#contacto")} onClick={(e) => onNavigate(e, "/#contacto")} tabIndex={open ? 0 : -1} className="pill pill--dark">
+            <Roll>{t.header.talk}</Roll>
             <span aria-hidden="true" className="dot" />
           </a>
           <p className="flex items-center gap-3 text-[15px] text-ink-soft-dark">

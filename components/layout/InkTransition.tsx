@@ -269,7 +269,8 @@ export function InkTransition() {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       if (covering.current) return;
       const a = (e.target as Element | null)?.closest("a");
-      if (!a || (a.target && a.target !== "_self") || a.hasAttribute("download")) return;
+      // data-reload: a full page load (a language change rebuilds <html>, which a client navigation would not).
+      if (!a || (a.target && a.target !== "_self") || a.hasAttribute("download") || a.hasAttribute("data-reload")) return;
       const url = new URL(a.href, window.location.href);
       if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return;
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;

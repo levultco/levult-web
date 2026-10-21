@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { nav } from "@/lib/content";
-import { products } from "@/lib/products";
+import { getProducts } from "@/lib/products";
+import { localePath, pageHref } from "@/lib/i18n";
+import { getI18n } from "@/lib/i18n/server";
 import { Wordmark } from "@/components/brand/Logo";
 
 /**
@@ -8,16 +9,18 @@ import { Wordmark } from "@/components/brand/Logo";
  * The fluid comes to rest over the end of the giant logo; the drops' canvas
  * inverts what it covers, so those letters turn white.
  */
-export function Footer() {
+export async function Footer() {
+  const { lang, t } = await getI18n();
+  const products = getProducts(lang);
   return (
     <footer data-scene="footer" className="relative pt-[clamp(96px,10vw,160px)]">
       <div className="frame grid gap-12 md:grid-cols-12 md:gap-6">
         <div className="md:col-span-4">
-          <p className="text-[15px] uppercase text-ink-soft">Navegación</p>
+          <p className="text-[15px] uppercase text-ink-soft">{t.footer.navigation}</p>
           <ul className="mt-4 grid gap-1 text-[20px] font-medium">
-            {nav.map((item) => (
+            {t.nav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="link">
+                <Link href={localePath(lang, item.href)} className="link">
                   {item.label}
                 </Link>
               </li>
@@ -25,11 +28,11 @@ export function Footer() {
           </ul>
         </div>
         <div className="md:col-span-4">
-          <p className="text-[15px] uppercase text-ink-soft">Destacados</p>
+          <p className="text-[15px] uppercase text-ink-soft">{t.footer.featured}</p>
           <ul className="mt-4 grid gap-1 text-[20px] font-medium">
             {products.map((p) => (
               <li key={p.slug}>
-                <Link href={`/features/${p.slug}`} className="link">
+                <Link href={localePath(lang, `/features/${p.slug}`)} className="link">
                   {p.name}
                 </Link>
               </li>
@@ -37,7 +40,7 @@ export function Footer() {
           </ul>
         </div>
         <p className="max-w-[30ch] text-[18px] leading-[1.5] text-ink-soft md:col-span-4">
-          Levult crea, lanza y hace crecer productos digitales propios.
+          {t.footer.tagline}
         </p>
       </div>
       {/* The drops' canvas sits above the page and inverts what it covers,
@@ -49,13 +52,13 @@ export function Footer() {
         <p>© 2026 Levult</p>
         <ul className="flex gap-6">
           <li>
-            <Link href="/aviso-legal" className="link">
-              Aviso legal
+            <Link href={pageHref(lang, "/aviso-legal")} className="link">
+              {t.footer.legal}
             </Link>
           </li>
           <li>
-            <Link href="/privacidad" className="link">
-              Privacidad
+            <Link href={pageHref(lang, "/privacidad")} className="link">
+              {t.footer.privacy}
             </Link>
           </li>
         </ul>

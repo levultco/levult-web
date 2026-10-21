@@ -3,7 +3,7 @@ import type { Product } from "@/lib/products";
 import { DropStage } from "@/components/webgl/DropStage";
 
 type Props = {
-  product: Product;
+  product: Pick<Product, "glow" | "slug">;
   children: ReactNode;
   className?: string;
 };

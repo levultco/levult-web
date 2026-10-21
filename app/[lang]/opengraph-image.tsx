@@ -1,13 +1,21 @@
 import { ImageResponse } from "next/og";
 import { OgWordmark, ogFonts, ogSize } from "@/lib/og";
 import { site } from "@/lib/site";
+import { getDictionary } from "@/lib/i18n/server";
+import { hasLang, defaultLang, locales } from "@/lib/i18n";
 
-export const alt = "Levult — Creamos lo que viene";
+export const alt = "Levult";
 export const size = ogSize;
 export const contentType = "image/png";
 
+export function generateStaticParams() {
+  return locales.map((lang) => ({ lang }));
+}
+
 /** The home page's link preview: the hero in miniature, with its glossy ink drop. */
-export default async function Image() {
+export default async function Image({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  const { meta } = getDictionary(hasLang(lang) ? lang : defaultLang);
   const { ground, ink } = site.colors;
   return new ImageResponse(
     (
@@ -43,11 +51,14 @@ export default async function Image() {
         <div style={{ position: "absolute", left: 72, bottom: 72, display: "flex", flexDirection: "column", maxWidth: 760 }}>
           {/* One div per line: the image renderer mis-measures wrapped display type. */}
           <div style={{ display: "flex", flexDirection: "column", fontSize: 118, fontWeight: 600, letterSpacing: "-0.055em", lineHeight: 1 }}>
-            <div style={{ display: "flex" }}>Creamos lo</div>
-            <div style={{ display: "flex" }}>que viene.</div>
+            {meta.ogLines.map((line) => (
+              <div key={line} style={{ display: "flex" }}>
+                {line}
+              </div>
+            ))}
           </div>
           <div style={{ marginTop: 40, fontSize: 28, fontWeight: 500, color: "#4a4a52", letterSpacing: "-0.01em", lineHeight: 1.3, maxWidth: 640 }}>
-            Productos digitales propios, de la primera idea al mundo real.
+            {meta.ogSub}
           </div>
         </div>
       </div>

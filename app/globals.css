@@ -131,6 +131,8 @@ html.js [data-scrub] .w {
     font-weight: 500;
     letter-spacing: -0.005em;
     text-transform: uppercase;
+    /* Buttons default to the arrow cursor; pills are one shape whether link or button. */
+    cursor: pointer;
     transition:
       transform var(--t-press) var(--ease-out),
       background-color var(--t-hover) ease,
@@ -231,10 +233,18 @@ a:focus-visible .roll > span:last-child {
 
 /* ---------- ParyUp interface (its own conventions, inside data-ui) ---------- */
 .pu-fade {
-  background: linear-gradient(to bottom, transparent 30%, #000 100%); /* taste-skill-ignore: the app's own glow fade */
+  background: linear-gradient(
+    to bottom,
+    transparent 30%,
+    #000 100%
+  ); /* taste-skill-ignore: the app's own glow fade */
 }
 .pu-scrim {
-  background: linear-gradient(to bottom, transparent, rgb(0 0 0 / 0.78)); /* taste-skill-ignore: the app's own poster scrim */
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgb(0 0 0 / 0.78)
+  ); /* taste-skill-ignore: the app's own poster scrim */
 }
 
 /* ---------- Reduced motion ---------- */

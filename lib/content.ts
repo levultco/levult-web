@@ -1,10 +1,3 @@
-export const nav = [
-  { label: "Inicio", href: "/" },
-  { label: "Destacados", href: "/#destacados" },
-  { label: "Compañía", href: "/#compania" },
-  { label: "Contacto", href: "/#contacto" },
-];
-
 export const contactEmail = "partners@levult.com";
 
 export type Question = {

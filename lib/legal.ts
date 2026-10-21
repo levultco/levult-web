@@ -15,11 +15,9 @@ export const legal = {
   /** Opcional. Ejemplo: "Inscrita en el Registro Mercantil de Madrid, tomo 1, folio 2, hoja M-3". */
   registry: "",
   email: contactEmail,
-  /** Date of the last change to either text. */
-  updated: "21 de octubre de 2026",
 };
 
 export const legalComplete = Boolean(legal.owner && legal.taxId && legal.address);
 
 /** A legal field, or a visible marker while it is still missing. */
-export const filled = (value: string, label: string) => value || `[${label}: pendiente]`;
+export const filled = (value: string, label: string, pending = "pendiente") => value || `[${label}: ${pending}]`;
