@@ -47,7 +47,18 @@ export function Footer() {
       </div>
       <div className="frame flex flex-wrap justify-between gap-3 pb-8 pt-8 text-[15px] text-ink-soft">
         <p>© 2026 Levult</p>
-        <p>Productos digitales propios</p>
+        <ul className="flex gap-6">
+          <li>
+            <Link href="/aviso-legal" className="link">
+              Aviso legal
+            </Link>
+          </li>
+          <li>
+            <Link href="/privacidad" className="link">
+              Privacidad
+            </Link>
+          </li>
+        </ul>
       </div>
     </footer>
   );
