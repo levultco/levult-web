@@ -10,7 +10,7 @@ type Props = {
 
 /**
  * A dark stage filled with the brand's liquid: glossy drops in the product's
- * colours, melting into one mass behind the device and following the cursor.
+ * colours, melting into one calm mass behind the device.
  * Without WebGL, or with reduced motion, the stage stays dark.
  */
 export function DeviceStage({ product, children, className = "" }: Props) {
